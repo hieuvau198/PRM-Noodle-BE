@@ -1,0 +1,164 @@
+-- Database: spicy_noodle_db
+CREATE DATABASE IF NOT EXISTS spicy_noodle_db;
+USE spicy_noodle_db;
+
+-- Users table
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(15),
+    address TEXT,
+    role ENUM('customer', 'staff', 'admin') DEFAULT 'customer',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Products table (mì cay)
+CREATE TABLE products (
+    product_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    base_price DECIMAL(10,2) NOT NULL,
+    image_url VARCHAR(255),
+    is_available BOOLEAN DEFAULT TRUE,
+    spice_level ENUM('mild', 'medium', 'hot', 'extra_hot') DEFAULT 'medium',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Toppings table
+CREATE TABLE toppings (
+    topping_id INT PRIMARY KEY AUTO_INCREMENT,
+    topping_name VARCHAR(50) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    description TEXT,
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Combos table
+CREATE TABLE combos (
+    combo_id INT PRIMARY KEY AUTO_INCREMENT,
+    combo_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    combo_price DECIMAL(10,2) NOT NULL,
+    image_url VARCHAR(255),
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Combo products relationship
+CREATE TABLE combo_products (
+    combo_product_id INT PRIMARY KEY AUTO_INCREMENT,
+    combo_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    FOREIGN KEY (combo_id) REFERENCES combos(combo_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+);
+
+-- Orders table
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    order_status ENUM('pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled') DEFAULT 'pending',
+    total_amount DECIMAL(10,2) NOT NULL,
+    payment_method ENUM('cash', 'card', 'digital_wallet') DEFAULT 'cash',
+    payment_status ENUM('pending', 'paid', 'failed') DEFAULT 'pending',
+    delivery_address TEXT,
+    notes TEXT,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    confirmed_at TIMESTAMP NULL,
+    completed_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- Order items table (for individual products)
+CREATE TABLE order_items (
+    order_item_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    unit_price DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+-- Order item toppings table
+CREATE TABLE order_item_toppings (
+    order_item_topping_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_item_id INT NOT NULL,
+    topping_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    unit_price DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id) ON DELETE CASCADE,
+    FOREIGN KEY (topping_id) REFERENCES toppings(topping_id)
+);
+
+-- Order combos table
+CREATE TABLE order_combos (
+    order_combo_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    combo_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    unit_price DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (combo_id) REFERENCES combos(combo_id)
+);
+
+-- Revenue tracking table
+CREATE TABLE daily_revenue (
+    revenue_id INT PRIMARY KEY AUTO_INCREMENT,
+    revenue_date DATE NOT NULL UNIQUE,
+    total_orders INT DEFAULT 0,
+    total_revenue DECIMAL(10,2) DEFAULT 0.00,
+    cash_revenue DECIMAL(10,2) DEFAULT 0.00,
+    card_revenue DECIMAL(10,2) DEFAULT 0.00,
+    digital_wallet_revenue DECIMAL(10,2) DEFAULT 0.00,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert sample data
+-- Sample users
+INSERT INTO users (username, email, password, full_name, phone, role) VALUES
+('admin', 'admin@spicynoodle.com', 'hashed_password_here', 'Administrator', '0123456789', 'admin'),
+('staff01', 'staff01@spicynoodle.com', 'hashed_password_here', 'Staff Member 1', '0123456788', 'staff'),
+('customer01', 'customer01@gmail.com', 'hashed_password_here', 'Nguyễn Văn A', '0987654321', 'customer');
+
+-- Sample products
+INSERT INTO products (product_name, description, base_price, spice_level) VALUES
+('Mì Cay Truyền Thống', 'Mì cay với nước dùng đậm đà, truyền thống', 35000, 'medium'),
+('Mì Cay Hải Sản', 'Mì cay với tôm, mực, cua đồng', 45000, 'medium'),
+('Mì Cay Bò', 'Mì cay với thịt bò tươi ngon', 40000, 'hot'),
+('Mì Cay Gà', 'Mì cay với thịt gà xé phay', 38000, 'mild');
+
+-- Sample toppings
+INSERT INTO toppings (topping_name, price, description) VALUES
+('Trứng Cút', 5000, 'Trứng cút luộc chín'),
+('Chả Cá', 8000, 'Chả cá chiên giòn'),
+('Xúc Xích', 10000, 'Xúc xích nướng thái lát'),
+('Phô Mai', 12000, 'Phô mai mozzarella tan chảy'),
+('Rau Muống', 5000, 'Rau muống luộc chín'),
+('Đậu Hũ', 6000, 'Đậu hũ chiên vàng');
+
+-- Sample combos
+INSERT INTO combos (combo_name, description, combo_price) VALUES
+('Combo Sinh Viên', 'Mì cay truyền thống + nước ngọt + trứng cút', 50000),
+('Combo Gia Đình', '2 tô mì cay + 2 nước ngọt + mix topping', 95000),
+('Combo Hải Sản Đặc Biệt', 'Mì cay hải sản + phô mai + chả cá + nước cam', 70000);
+
+-- Sample combo products
+INSERT INTO combo_products (combo_id, product_id, quantity) VALUES
+(1, 1, 1), -- Combo Sinh Viên có 1 mì cay truyền thống
+(2, 1, 2), -- Combo Gia Đình có 2 mì cay truyền thống
+(3, 2, 1); -- Combo Hải Sản có 1 mì cay hải sản
