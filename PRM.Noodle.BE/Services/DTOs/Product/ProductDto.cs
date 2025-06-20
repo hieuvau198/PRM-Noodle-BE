@@ -59,4 +59,9 @@ namespace Services.DTOs.Product
         [StringLength(50)]
         public string? SpiceLevel { get; set; }
     }
+    public class ProductIsAvailableDto
+    {
+        [Required]
+        public bool IsAvailable { get; set; }
+    }
 }
