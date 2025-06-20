@@ -54,4 +54,10 @@ namespace Services.DTOs.Combo
 
         public bool? IsAvailable { get; set; }
     }
+
+    public class ComboIsAvailableDto
+    {
+        [Required]
+        public bool IsAvailable { get; set; }
+    }
 }

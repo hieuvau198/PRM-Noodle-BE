@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Repositories.Interfaces;
 using Repositories.Models;
+using Repositories.Persistence;
 using Services.DTOs.Product;
 using Services.Interfaces;
 using System;
@@ -133,6 +134,16 @@ namespace Services.Services
             var products = await _unitOfWork.Products.FindAsync(p => p.SpiceLevel == spiceLevel);
             return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
+        public async Task<bool> PatchIsAvailableAsync(int productId, bool isAvailable)
+        {
+            var product = await _unitOfWork.Products.GetByIdAsync(productId);
+            if (product == null) return false;
+            product.IsAvailable = isAvailable;
+            product.UpdatedAt = DateTime.UtcNow;
+            _unitOfWork.Products.Update(product);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
     }
 
     // Extension method for combining expressions
@@ -173,4 +184,5 @@ namespace Services.Services
             }
         }
     }
+
 }

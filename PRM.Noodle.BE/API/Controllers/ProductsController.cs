@@ -188,6 +188,19 @@ namespace API.Controllers
             }
         }
 
+        [HttpPatch("{id}/is-available")]
+        public async Task<IActionResult> PatchIsAvailable(int id, [FromBody] ProductIsAvailableDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _productService.PatchIsAvailableAsync(id, dto.IsAvailable);
+            if (!result)
+                return NotFound();
+
+            return NoContent();
+        }
+
         /// <summary>
         /// Delete a product
         /// </summary>

@@ -51,6 +51,19 @@ public class ComboController : ControllerBase
         return NoContent();
     }
 
+    [HttpPatch("{id}/is-available")]
+    public async Task<IActionResult> PatchIsAvailable(int id, [FromBody] ComboIsAvailableDto dto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _service.PatchIsAvailableAsync(id, dto.IsAvailable);
+        if (!result)
+            return NotFound();
+
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
