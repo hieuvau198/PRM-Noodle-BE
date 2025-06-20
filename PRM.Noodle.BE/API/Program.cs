@@ -43,6 +43,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IComboService, ComboService>();
+builder.Services.AddScoped<IToppingService, ToppingService>();
 
 builder.Services.AddCors(options =>
 {
