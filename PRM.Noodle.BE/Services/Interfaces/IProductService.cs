@@ -23,5 +23,6 @@ namespace Services.Interfaces
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
         Task<IEnumerable<ProductDto>> GetBySpiceLevelAsync(string spiceLevel);
+        Task<bool> PatchIsAvailableAsync(int productId, bool isAvailable);
     }
 }

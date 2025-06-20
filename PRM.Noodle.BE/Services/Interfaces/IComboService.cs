@@ -15,5 +15,7 @@ namespace Services.Interfaces
         Task<bool> UpdateAsync(int id, UpdateComboDto dto);
         Task<bool> DeleteAsync(int id);
         Task<IEnumerable<ComboDto>> GetAvailableAsync();
+        Task<bool> PatchIsAvailableAsync(int comboId, bool isAvailable);
+
     }
 }

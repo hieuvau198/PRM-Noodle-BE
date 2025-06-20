@@ -65,4 +65,15 @@ public class ComboService : IComboService
         var combos = await _comboRepo.FindAsync(c => c.IsAvailable == true);
         return _mapper.Map<IEnumerable<ComboDto>>(combos);
     }
+
+    public async Task<bool> PatchIsAvailableAsync(int comboId, bool isAvailable)
+    {
+        var combo = await _comboRepo.GetByIdAsync(comboId);
+        if (combo == null) return false;
+        combo.IsAvailable = isAvailable;
+        combo.UpdatedAt = DateTime.UtcNow;
+        _comboRepo.Update(combo);
+        await _uow.CompleteAsync();
+        return true;
+    }
 }
