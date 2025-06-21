@@ -17,10 +17,7 @@ namespace API.Controllers
             _productService = productService;
         }
 
-        /// <summary>
-        /// Get all products
-        /// </summary>
-        /// <returns>List of all products</returns>
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
         {

@@ -4,11 +4,11 @@ using Services.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ToppingController : ControllerBase
+public class ToppingsController : ControllerBase
 {
     private readonly IToppingService _service;
 
-    public ToppingController(IToppingService service)
+    public ToppingsController(IToppingService service)
     {
         _service = service;
     }
