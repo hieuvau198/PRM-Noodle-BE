@@ -18,6 +18,9 @@ namespace Repositories.Interfaces
         IGenericRepository<OrderItem> OrderItems { get; }
         IGenericRepository<OrderCombo> OrderCombos { get; }
         IGenericRepository<DailyRevenue> DailyRevenues { get; }
+        IGenericRepository<OrderItemTopping> OrderItemTopping { get; }
+
+
 
         int Complete();
         Task<int> CompleteAsync();
