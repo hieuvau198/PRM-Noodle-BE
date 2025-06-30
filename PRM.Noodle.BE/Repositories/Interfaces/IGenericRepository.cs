@@ -18,6 +18,8 @@ namespace Repositories.Interfaces
         IEnumerable<T> Find(Expression<Func<T, bool>> expression);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression);
 
+        IQueryable<T> GetQueryable();
+
         T SingleOrDefault(Expression<Func<T, bool>> expression);
         Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> expression);
 

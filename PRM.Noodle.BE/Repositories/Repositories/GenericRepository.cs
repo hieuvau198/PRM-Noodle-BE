@@ -154,6 +154,12 @@ namespace Repositories.Repositories
                 return await _dbSet.CountAsync();
             return await _dbSet.CountAsync(expression);
         }
+
+        public IQueryable<T> GetQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
+
     }
 
 

@@ -14,6 +14,7 @@ namespace Repositories.Persistence
     public class UnitOfWork : IUnitOfWork
     {
         private readonly SpicyNoodleDbContext _context;
+
         private IDbContextTransaction _transaction;
 
         public IUserRepository Users { get; private set; }
@@ -24,6 +25,7 @@ namespace Repositories.Persistence
         public IGenericRepository<OrderItem> OrderItems { get; private set; }
         public IGenericRepository<OrderCombo> OrderCombos { get; private set; }
         public IGenericRepository<DailyRevenue> DailyRevenues { get; private set; }
+        public IGenericRepository<OrderItemTopping> OrderItemTopping { get; private set; }
 
         public UnitOfWork(SpicyNoodleDbContext context,
                           IUserRepository userRepository)
@@ -37,6 +39,7 @@ namespace Repositories.Persistence
             Orders = new GenericRepository<Order>(_context);
             OrderItems = new GenericRepository<OrderItem>(_context);
             OrderCombos = new GenericRepository<OrderCombo>(_context);
+            OrderItemTopping = new GenericRepository<OrderItemTopping>(_context);
             DailyRevenues = new GenericRepository<DailyRevenue>(_context);
         }
 
