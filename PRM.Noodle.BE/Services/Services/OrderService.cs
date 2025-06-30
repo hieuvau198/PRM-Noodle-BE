@@ -415,5 +415,325 @@ namespace Services.Services
                 PaymentMethods = new List<string> { "cash", "card", "digital_wallet" }
             };
         }
+           public async Task<OrderItemDto?> AddItemToOrderAsync(int orderId, AddOrderItemDto addItemDto)
+        {
+            // Validate order exists and can be modified
+            var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+            if (order == null || order.OrderStatus != "pending")
+                return null;
+
+            // Validate product exists
+            var product = await _unitOfWork.Products.GetByIdAsync(addItemDto.ProductId);
+            if (product == null)
+                throw new ArgumentException($"Product with ID {addItemDto.ProductId} does not exist");
+
+            if (addItemDto.Quantity <= 0)
+                throw new ArgumentException("Product quantity must be greater than 0");
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                // Create order item
+                var orderItem = new OrderItem
+                {
+                    OrderId = orderId,
+                    ProductId = addItemDto.ProductId,
+                    Quantity = addItemDto.Quantity,
+                    UnitPrice = product.BasePrice,
+                    Subtotal = product.BasePrice * addItemDto.Quantity
+                };
+
+                await _unitOfWork.OrderItems.AddAsync(orderItem);
+                await _unitOfWork.CompleteAsync(); // Save to get OrderItemId
+
+                decimal toppingTotal = 0;
+
+                // Process toppings if any
+                if (addItemDto.Toppings != null && addItemDto.Toppings.Any())
+                {
+                    foreach (var toppingDto in addItemDto.Toppings)
+                    {
+                        // Validate topping exists
+                        var topping = await _unitOfWork.Toppings.GetByIdAsync(toppingDto.ToppingId);
+                        if (topping == null)
+                            throw new ArgumentException($"Topping with ID {toppingDto.ToppingId} does not exist");
+
+                        if (toppingDto.Quantity <= 0)
+                            throw new ArgumentException("Topping quantity must be greater than 0");
+
+                        var orderItemTopping = new OrderItemTopping
+                        {
+                            OrderItemId = orderItem.OrderItemId,
+                            ToppingId = toppingDto.ToppingId,
+                            Quantity = toppingDto.Quantity,
+                            UnitPrice = topping.Price,
+                            Subtotal = topping.Price * toppingDto.Quantity
+                        };
+
+                        await _unitOfWork.OrderItemTopping.AddAsync(orderItemTopping);
+                        toppingTotal += orderItemTopping.Subtotal;
+                    }
+                }
+
+                // Update order total amount
+                order.TotalAmount += (orderItem.Subtotal + toppingTotal);
+                _unitOfWork.Orders.Update(order);
+
+                await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                // Return the created order item with full details
+                var createdItem = await _unitOfWork.OrderItems.GetQueryable()
+                    .Include(oi => oi.Product)
+                    .Include(oi => oi.OrderItemToppings)
+                        .ThenInclude(oit => oit.Topping)
+                    .FirstOrDefaultAsync(oi => oi.OrderItemId == orderItem.OrderItemId);
+
+                return _mapper.Map<OrderItemDto>(createdItem);
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+
+        public async Task<bool> RemoveItemFromOrderAsync(int orderId, int itemId)
+        {
+            // Validate order exists and can be modified
+            var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+            if (order == null || order.OrderStatus != "pending")
+                return false;
+
+            // Get order item with toppings
+            var orderItem = await _unitOfWork.OrderItems.GetQueryable()
+                .Include(oi => oi.OrderItemToppings)
+                .FirstOrDefaultAsync(oi => oi.OrderItemId == itemId && oi.OrderId == orderId);
+
+            if (orderItem == null)
+                return false;
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                // Calculate total amount to subtract
+                decimal amountToSubtract = orderItem.Subtotal;
+                if (orderItem.OrderItemToppings != null && orderItem.OrderItemToppings.Any())
+                {
+                    amountToSubtract += orderItem.OrderItemToppings.Sum(oit => oit.Subtotal);
+                }
+
+                // Remove order item (toppings will be removed by cascade delete)
+                _unitOfWork.OrderItems.Remove(orderItem);
+
+                // Update order total amount
+                order.TotalAmount -= amountToSubtract;
+                _unitOfWork.Orders.Update(order);
+
+                await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+
+        public async Task<OrderItemDto?> UpdateOrderItemAsync(int orderId, int itemId, UpdateOrderItemDto updateItemDto)
+        {
+            // Validate order exists and can be modified
+            var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+            if (order == null || order.OrderStatus != "pending")
+                return null;
+
+            // Get order item with toppings
+            var orderItem = await _unitOfWork.OrderItems.GetQueryable()
+                .Include(oi => oi.Product)
+                .Include(oi => oi.OrderItemToppings)
+                .FirstOrDefaultAsync(oi => oi.OrderItemId == itemId && oi.OrderId == orderId);
+
+            if (orderItem == null)
+                return null;
+
+            if (updateItemDto.Quantity <= 0)
+                throw new ArgumentException("Product quantity must be greater than 0");
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                // Calculate old total (item + toppings)
+                decimal oldTotal = orderItem.Subtotal;
+                if (orderItem.OrderItemToppings != null && orderItem.OrderItemToppings.Any())
+                {
+                    oldTotal += orderItem.OrderItemToppings.Sum(oit => oit.Subtotal);
+                }
+
+                // Update quantity and subtotal
+                orderItem.Quantity = updateItemDto.Quantity;
+                orderItem.Subtotal = orderItem.UnitPrice * (updateItemDto.Quantity ?? 0);
+
+                // Remove existing toppings
+                if (orderItem.OrderItemToppings != null && orderItem.OrderItemToppings.Any())
+                {
+                    foreach (var topping in orderItem.OrderItemToppings.ToList())
+                    {
+                        _unitOfWork.OrderItemTopping.Remove(topping);
+                    }
+                }
+
+                decimal newToppingTotal = 0;
+
+                // Add new toppings
+                if (updateItemDto.Toppings != null && updateItemDto.Toppings.Any())
+                {
+                    foreach (var toppingDto in updateItemDto.Toppings)
+                    {
+                        // Validate topping exists
+                        var topping = await _unitOfWork.Toppings.GetByIdAsync(toppingDto.ToppingId);
+                        if (topping == null)
+                            throw new ArgumentException($"Topping with ID {toppingDto.ToppingId} does not exist");
+
+                        if (toppingDto.Quantity <= 0)
+                            throw new ArgumentException("Topping quantity must be greater than 0");
+
+                        var orderItemTopping = new OrderItemTopping
+                        {
+                            OrderItemId = orderItem.OrderItemId,
+                            ToppingId = toppingDto.ToppingId,
+                            Quantity = toppingDto.Quantity,
+                            UnitPrice = topping.Price,
+                            Subtotal = topping.Price * toppingDto.Quantity
+                        };
+
+                        await _unitOfWork.OrderItemTopping.AddAsync(orderItemTopping);
+                        newToppingTotal += orderItemTopping.Subtotal;
+                    }
+                }
+
+                // Update order item
+                _unitOfWork.OrderItems.Update(orderItem);
+
+                // Calculate new total
+                decimal newTotal = orderItem.Subtotal + newToppingTotal;
+
+                // Update order total amount
+                order.TotalAmount = order.TotalAmount - oldTotal + newTotal;
+                _unitOfWork.Orders.Update(order);
+
+                await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                // Return updated order item with full details
+                var updatedItem = await _unitOfWork.OrderItems.GetQueryable()
+                    .Include(oi => oi.Product)
+                    .Include(oi => oi.OrderItemToppings)
+                        .ThenInclude(oit => oit.Topping)
+                    .FirstOrDefaultAsync(oi => oi.OrderItemId == itemId);
+
+                return _mapper.Map<OrderItemDto>(updatedItem);
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+
+        // ===== OrderCombo Management =====
+
+        public async Task<OrderComboDto?> AddComboToOrderAsync(int orderId, AddOrderComboDto addComboDto)
+        {
+            // Validate order exists and can be modified
+            var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+            if (order == null || order.OrderStatus != "pending")
+                return null;
+
+            // Validate combo exists
+            var combo = await _unitOfWork.Combos.GetByIdAsync(addComboDto.ComboId);
+            if (combo == null)
+                throw new ArgumentException($"Combo with ID {addComboDto.ComboId} does not exist");
+
+            if (addComboDto.Quantity <= 0)
+                throw new ArgumentException("Combo quantity must be greater than 0");
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                // Create order combo
+                var orderCombo = new OrderCombo
+                {
+                    OrderId = orderId,
+                    ComboId = addComboDto.ComboId,
+                    Quantity = addComboDto.Quantity,
+                    UnitPrice = combo.ComboPrice,
+                    Subtotal = combo.ComboPrice * addComboDto.Quantity
+                };
+
+                await _unitOfWork.OrderCombos.AddAsync(orderCombo);
+
+                // Update order total amount
+                order.TotalAmount += orderCombo.Subtotal;
+                _unitOfWork.Orders.Update(order);
+
+                await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                // Return the created order combo with full details
+                var createdCombo = await _unitOfWork.OrderCombos.GetQueryable()
+                    .Include(oc => oc.Combo)
+                    .FirstOrDefaultAsync(oc => oc.OrderComboId == orderCombo.OrderComboId);
+
+                return _mapper.Map<OrderComboDto>(createdCombo);
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+
+        public async Task<bool> RemoveComboFromOrderAsync(int orderId, int orderComboId)
+        {
+            // Validate order exists and can be modified
+            var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+            if (order == null || order.OrderStatus != "pending")
+                return false;
+
+            // Get order combo
+            var orderCombo = await _unitOfWork.OrderCombos.GetQueryable()
+                .FirstOrDefaultAsync(oc => oc.OrderComboId == orderComboId && oc.OrderId == orderId);
+
+            if (orderCombo == null)
+                return false;
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                // Remove order combo
+                _unitOfWork.OrderCombos.Remove(orderCombo);
+
+                // Update order total amount
+                order.TotalAmount -= orderCombo.Subtotal;
+                _unitOfWork.Orders.Update(order);
+
+                await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
     }
 }

@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.Interfaces
-{ public interface IOrderService
+{
+    public interface IOrderService
     {
 
         Task<OrderDto?> CreateOrderAsync(CreateOrderDto createOrderDto);
@@ -23,6 +24,16 @@ namespace Services.Interfaces
         Task<PagedOrderResponse> GetPendingOrdersAsync(int page = 1, int pageSize = 10);
         Task<RevenueReportDto> GetRevenueReportAsync(DateTime fromDate, DateTime toDate);
         OrderStatusesDto GetOrderStatuses();
+
+        Task<OrderItemDto?> AddItemToOrderAsync(int orderId, AddOrderItemDto addItemDto);
+        Task<bool> RemoveItemFromOrderAsync(int orderId, int itemId);
+        Task<OrderItemDto?> UpdateOrderItemAsync(int orderId, int itemId, UpdateOrderItemDto updateItemDto);
+
+        Task<OrderComboDto?> AddComboToOrderAsync(int orderId, AddOrderComboDto addComboDto);
+        Task<bool> RemoveComboFromOrderAsync(int orderId, int orderComboId);
+
     }
-  
 }
+    
+  
+
