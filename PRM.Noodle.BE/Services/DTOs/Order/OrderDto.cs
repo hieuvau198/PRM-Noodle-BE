@@ -201,4 +201,54 @@ namespace Services.DTOs.Order
         public List<string> PaymentStatuses { get; set; } = new List<string>();
         public List<string> PaymentMethods { get; set; } = new List<string>();
     }
+    public class AddOrderItemDto
+    {
+        public int ProductId { get; set; }
+
+        public int Quantity { get; set; }
+
+        public List<CreateOrderItemToppingDto>? Toppings { get; set; } = new List<CreateOrderItemToppingDto>();
+    }
+
+    // DTO cho việc cập nhật OrderItem
+    public class UpdateOrderItemDto
+    {
+        public int? Quantity { get; set; }
+
+        public List<UpdateOrderItemToppingDto>? Toppings { get; set; }
+    }
+
+    // DTO cho việc cập nhật topping trong OrderItem
+    public class UpdateOrderItemToppingDto
+    {
+        public int ToppingId { get; set; }
+
+        public int Quantity { get; set; }
+    }
+
+    // DTO cho việc thêm OrderCombo vào đơn hàng
+    public class AddOrderComboDto
+    {
+        public int ComboId { get; set; }
+
+        public int Quantity { get; set; }
+    }
+
+    // Response DTO cho OrderItem operations
+    public class OrderItemOperationResult
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public OrderItemDto? OrderItem { get; set; }
+        public decimal UpdatedOrderTotal { get; set; }
+    }
+
+    // Response DTO cho OrderCombo operations
+    public class OrderComboOperationResult
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public OrderComboDto? OrderCombo { get; set; }
+        public decimal UpdatedOrderTotal { get; set; }
+    }
 }
