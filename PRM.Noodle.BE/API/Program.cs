@@ -45,6 +45,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IComboService, ComboService>();
 builder.Services.AddScoped<IToppingService, ToppingService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddHttpClient<IChatService, ChatService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 builder.Services.AddCors(options =>
 {
