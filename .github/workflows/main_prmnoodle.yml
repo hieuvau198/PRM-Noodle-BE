@@ -24,10 +24,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build PRM.Noodle.BE/PRM.Noodle.BE.sln --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish PRM.Noodle.BE/API/API.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -38,7 +38,6 @@ jobs:
   deploy:
     runs-on: windows-latest
     needs: build
-    
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
@@ -52,9 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7C98BED187534A02A4CB22454F8745AE }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D8A1AAEB763F400C9B8FA9F21CE9890D }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FD8A1A77CAE24C449BC94DC47F61C1DA }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_90274885B7884C1B86910720853697A1 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1CD9006542204470BB6E383B4588EB7A }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5601F014594143B2B274AAD1CE5FA297 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
