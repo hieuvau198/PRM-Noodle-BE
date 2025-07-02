@@ -38,7 +38,7 @@ namespace Services.Services
             _logger = logger;
             _httpClient = httpClient;
             _geminiApiKey = _configuration["GeminiAPI:ApiKey"] ?? throw new InvalidOperationException("Gemini API key not configured");
-            _geminiEndpoint = _configuration["GeminiAPI:Endpoint"] ?? "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+            _geminiEndpoint = _configuration["GeminiAPI:Endpoint"] ?? "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent";
         }
 
         public async Task<ChatResponseDto> ProcessChatMessageAsync(ChatRequestDto request)
@@ -76,7 +76,10 @@ namespace Services.Services
                 _logger.LogError(ex, "Error processing chat message: {Message}", request.Message);
                 return new ChatResponseDto
                 {
-                    Response = "I apologize, but I'm having trouble processing your request right now. Please try again later.",
+                    // Response = "I apologize, but I'm having trouble processing your request right now. Please try again later.",
+                    Response = "I apologize, but I'm having trouble processing your request right now. Please try again later."
+                        + "\n" + ex.Message + "\n" + ex.StackTrace + "\n"
+                    ,
                     SessionId = request.SessionId ?? Guid.NewGuid().ToString(),
                     Timestamp = DateTime.UtcNow,
                     IsProductQuery = false
