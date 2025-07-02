@@ -78,7 +78,7 @@ namespace Services.Services
                 {
                     // Response = "I apologize, but I'm having trouble processing your request right now. Please try again later.",
                     Response = "I apologize, but I'm having trouble processing your request right now. Please try again later."
-                        + "\n" + ex.Message + "\n" + ex.StackTrace + "\n"
+                        + "\n" + ex.Message + "\n" + ex.StackTrace + "\n" + ex.ToString()
                     ,
                     SessionId = request.SessionId ?? Guid.NewGuid().ToString(),
                     Timestamp = DateTime.UtcNow,
