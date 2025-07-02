@@ -42,10 +42,8 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing chat message");
-                return StatusCode(500, new
-                {
-                    message = "An error occurred while processing your message. Please try again later."
-                });
+                return StatusCode(500, new { message = ex.Message, stack = ex.StackTrace });
+
             }
         }
 
