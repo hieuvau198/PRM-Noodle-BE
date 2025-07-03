@@ -27,6 +27,25 @@ namespace API.Controllers
             return Ok(toppings);
         }
 
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedToppingResponse>> GetPaged(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] bool? isAvailable = null)
+        {
+            var (items, totalCount) = await _service.GetPagedAsync(page, pageSize, searchTerm, isAvailable);
+            var response = new PagedToppingResponse
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
+            return Ok(response);
+        }
+
         /// <summary>
         /// Get available toppings only
         /// </summary>
