@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Interfaces;
 using Repositories.Models;
 using Services.DTOs.Combo;
@@ -24,6 +25,27 @@ namespace Services.Services
         {
             var combos = await _comboRepo.GetAllAsync();
             return _mapper.Map<IEnumerable<ComboDto>>(combos);
+        }
+
+        public async Task<(IEnumerable<ComboDto> Items, int TotalCount)> GetPagedAsync(
+        int page, int pageSize, string searchTerm = null, bool? isAvailable = null)
+        {
+            var query = _comboRepo.GetQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+                query = query.Where(c => c.ComboName.Contains(searchTerm) || (c.Description != null && c.Description.Contains(searchTerm)));
+
+            if (isAvailable.HasValue)
+                query = query.Where(c => c.IsAvailable == isAvailable);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderBy(c => c.ComboId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (_mapper.Map<IEnumerable<ComboDto>>(items), totalCount);
         }
 
         public async Task<ComboDto> GetByIdAsync(int id)

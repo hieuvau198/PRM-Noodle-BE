@@ -3,6 +3,7 @@ using Repositories.Interfaces;
 using Repositories.Models;
 using Services.DTOs.Topping;
 using Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Services.Services
 {
@@ -24,6 +25,28 @@ namespace Services.Services
             var toppings = await _toppingRepo.GetAllAsync();
             return _mapper.Map<IEnumerable<ToppingDto>>(toppings);
         }
+
+        public async Task<(IEnumerable<ToppingDto> Items, int TotalCount)> GetPagedAsync(
+        int page, int pageSize, string searchTerm = null, bool? isAvailable = null)
+        {
+            var query = _toppingRepo.GetQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+                query = query.Where(t => t.ToppingName.Contains(searchTerm));
+
+            if (isAvailable.HasValue)
+                query = query.Where(t => t.IsAvailable == isAvailable);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderBy(t => t.ToppingId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (_mapper.Map<IEnumerable<ToppingDto>>(items), totalCount);
+        }
+
 
         public async Task<ToppingDto> GetByIdAsync(int id)
         {

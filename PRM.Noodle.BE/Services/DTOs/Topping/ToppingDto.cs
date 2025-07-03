@@ -48,4 +48,12 @@ namespace Services.DTOs.Topping
         [Required]
         public bool IsAvailable { get; set; }
     }
+    public class PagedToppingResponse
+    {
+        public IEnumerable<ToppingDto> Items { get; set; }
+        public int TotalCount { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+    }
 }

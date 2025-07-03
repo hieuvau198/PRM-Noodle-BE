@@ -11,6 +11,7 @@ namespace Services.Interfaces
         Task<bool> DeleteAsync(int id);
         Task<IEnumerable<ComboDto>> GetAvailableAsync();
         Task<bool> PatchIsAvailableAsync(int comboId, bool isAvailable);
+        Task<(IEnumerable<ComboDto> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string searchTerm = null, bool? isAvailable = null);
 
     }
 }
