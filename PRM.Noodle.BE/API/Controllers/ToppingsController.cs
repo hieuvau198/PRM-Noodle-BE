@@ -1,71 +1,97 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services.DTOs.Topping;
 using Services.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-[ApiController]
-[Route("api/[controller]")]
-public class ToppingsController : ControllerBase
+namespace API.Controllers
 {
-    private readonly IToppingService _service;
-
-    public ToppingsController(IToppingService service)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ToppingsController : ControllerBase
     {
-        _service = service;
-    }
+        private readonly IToppingService _service;
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var toppings = await _service.GetAllAsync();
-        return Ok(toppings);
-    }
+        public ToppingsController(IToppingService service)
+        {
+            _service = service;
+        }
 
-    [HttpGet("available")]
-    public async Task<IActionResult> GetAvailable()
-    {
-        var toppings = await _service.GetAvailableAsync();
-        return Ok(toppings);
-    }
+        /// <summary>
+        /// Get all toppings
+        /// </summary>
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ToppingDto>>> GetAll()
+        {
+            var toppings = await _service.GetAllAsync();
+            return Ok(toppings);
+        }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var topping = await _service.GetByIdAsync(id);
-        if (topping == null) return NotFound();
-        return Ok(topping);
-    }
+        /// <summary>
+        /// Get available toppings only
+        /// </summary>
+        [HttpGet("available")]
+        public async Task<ActionResult<IEnumerable<ToppingDto>>> GetAvailable()
+        {
+            var toppings = await _service.GetAvailableAsync();
+            return Ok(toppings);
+        }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateToppingDto dto)
-    {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        var created = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = created.ToppingId }, created);
-    }
+        /// <summary>
+        /// Get topping by id
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ToppingDto>> GetById(int id)
+        {
+            var topping = await _service.GetByIdAsync(id);
+            if (topping == null) return NotFound();
+            return Ok(topping);
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateToppingDto dto)
-    {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        var updated = await _service.UpdateAsync(id, dto);
-        if (updated == null) return NotFound();
-        return Ok(updated);
-    }
+        /// <summary>
+        /// Create new topping
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<ToppingDto>> Create([FromBody] CreateToppingDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var created = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = created.ToppingId }, created);
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var result = await _service.DeleteAsync(id);
-        if (!result) return NotFound();
-        return NoContent();
-    }
+        /// <summary>
+        /// Update topping
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ToppingDto>> Update(int id, [FromBody] UpdateToppingDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var updated = await _service.UpdateAsync(id, dto);
+            if (updated == null) return NotFound();
+            return Ok(updated);
+        }
 
-    [HttpPatch("{id}/is-available")]
-    public async Task<IActionResult> PatchIsAvailable(int id, [FromBody] ToppingIsAvailableDto dto)
-    {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        var result = await _service.PatchIsAvailableAsync(id, dto.IsAvailable);
-        if (!result) return NotFound();
-        return NoContent();
+        /// <summary>
+        /// Delete topping
+        /// </summary>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _service.DeleteAsync(id);
+            if (!result) return NotFound();
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Patch isAvailable for topping
+        /// </summary>
+        [HttpPatch("{id}/is-available")]
+        public async Task<IActionResult> PatchIsAvailable(int id, [FromBody] ToppingIsAvailableDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var result = await _service.PatchIsAvailableAsync(id, dto.IsAvailable);
+            if (!result) return NotFound();
+            return NoContent();
+        }
     }
 }
