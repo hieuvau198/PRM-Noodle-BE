@@ -27,7 +27,7 @@ jobs:
         run: dotnet build PRM.Noodle.BE/PRM.Noodle.BE.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish PRM.Noodle.BE/API/API.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish PRM.Noodle.BE/PRM.Noodle.BE.API/PRM.Noodle.BE.API.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4

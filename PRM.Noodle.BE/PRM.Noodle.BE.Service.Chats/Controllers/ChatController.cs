@@ -87,7 +87,7 @@ namespace PRM.Noodle.BE.Service.Chats.Controllers
         /// Get current product context for debugging purposes
         /// </summary>
         /// <returns>Current product context used by AI</returns>
-        [HttpGet("contextxxx")]
+        [HttpGet("context")]
         public async Task<ActionResult<object>> GetProductContext()
         {
             var requestId = Guid.NewGuid().ToString("N")[..8];

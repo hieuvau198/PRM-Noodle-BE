@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.API", "PRM.No
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Share", "PRM.Noodle.BE.Share\PRM.Noodle.BE.Share.csproj", "{AFBFF7A3-D685-4162-8C16-76B22456F615}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Products", "PRM.Noodle.BE.Service.Products\PRM.Noodle.BE.Service.Products.csproj", "{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Orders", "PRM.Noodle.BE.Service.Orders\PRM.Noodle.BE.Service.Orders.csproj", "{35874E59-4F7E-4846-9A81-2267FE598B95}"
@@ -33,10 +31,6 @@ Global
 		{AFBFF7A3-D685-4162-8C16-76B22456F615}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFBFF7A3-D685-4162-8C16-76B22456F615}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFBFF7A3-D685-4162-8C16-76B22456F615}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
