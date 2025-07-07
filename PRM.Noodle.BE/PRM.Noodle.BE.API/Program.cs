@@ -3,7 +3,6 @@ using PRM.Noodle.BE.Share.Data;
 using PRM.Noodle.BE.Share.Interfaces;
 using PRM.Noodle.BE.Share.Persistence;
 using PRM.Noodle.BE.Share.Repositories;
-using Services.Interfaces;
 using PRM.Noodle.BE.Service.Products.Controllers;
 using PRM.Noodle.BE.Service.Products.Services;
 using PRM.Noodle.BE.Service.Products.Mappings;
