@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Products\PRM.Noodle.BE.Service.Products.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 

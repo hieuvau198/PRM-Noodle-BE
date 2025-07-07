@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace PRM.Noodle.BE.Service.Products.Services
 {
-    public class ProductService : IProductService
+    public class ProductsService : IProductsService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductsService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

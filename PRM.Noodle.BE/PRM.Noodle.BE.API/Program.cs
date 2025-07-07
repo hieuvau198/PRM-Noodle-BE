@@ -6,6 +6,8 @@ using PRM.Noodle.BE.Share.Repositories;
 using Services.Interfaces;
 using Services.Mappings;
 using Services.Services;
+using PRM.Noodle.BE.Service.Products.Controllers;
+using PRM.Noodle.BE.Service.Products.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,10 @@ builder.Services.AddScoped<IToppingService, ToppingService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddHttpClient<IChatService, ChatService>();
 builder.Services.AddScoped<IChatService, ChatService>();
+
+builder.Services.AddScoped<IProductsService, ProductsService>();
+builder.Services.AddControllers()
+    .AddApplicationPart(typeof(ProductsController).Assembly);
 
 builder.Services.AddCors(options =>
 {

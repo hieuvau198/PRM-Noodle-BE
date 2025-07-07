@@ -16,9 +16,9 @@ namespace PRM.Noodle.BE.Service.Products.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductService _productService;
+        private readonly IProductsService _productService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductsService productService)
         {
             _productService = productService;
         }
