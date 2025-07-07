@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>53a587d6-c1dc-4462-9bfd-8688a6846fa5</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Chats\PRM.Noodle.BE.Service.Chats.csproj" />
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Combos\PRM.Noodle.BE.Service.Combos.csproj" />
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Orders\PRM.Noodle.BE.Service.Orders.csproj" />
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Products\PRM.Noodle.BE.Service.Products.csproj" />
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Toppings\PRM.Noodle.BE.Service.Toppings.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
+  </ItemGroup>
+
+</Project>
