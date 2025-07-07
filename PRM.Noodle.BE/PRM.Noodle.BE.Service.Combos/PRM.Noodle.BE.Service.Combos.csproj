@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PRM.Noodle.BE.Share\PRM.Noodle.BE.Share.csproj" />
+  </ItemGroup>
+
 </Project>

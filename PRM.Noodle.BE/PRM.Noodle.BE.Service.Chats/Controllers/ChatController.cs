@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Services.DTOs.AIChat;
-using Services.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using PRM.Noodle.BE.Service.Chats.Models;
+using PRM.Noodle.BE.Service.Chats.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace PRM.Noodle.BE.API.Controllers
+namespace PRM.Noodle.BE.Service.Chats.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -81,7 +87,7 @@ namespace PRM.Noodle.BE.API.Controllers
         /// Get current product context for debugging purposes
         /// </summary>
         /// <returns>Current product context used by AI</returns>
-        [HttpGet("context")]
+        [HttpGet("contextxxx")]
         public async Task<ActionResult<object>> GetProductContext()
         {
             var requestId = Guid.NewGuid().ToString("N")[..8];

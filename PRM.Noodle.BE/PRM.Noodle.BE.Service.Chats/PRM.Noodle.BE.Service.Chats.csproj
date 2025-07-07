@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Mappings\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Products\PRM.Noodle.BE.Service.Products.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PRM.Noodle.BE.Service.Products.Services
 {
-    public interface IProductsService
+    public interface IProductService
     {
         Task<ProductDto> GetByIdAsync(int id);
         Task<IEnumerable<ProductDto>> GetAllAsync();

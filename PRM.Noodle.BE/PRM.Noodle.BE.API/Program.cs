@@ -4,10 +4,16 @@ using PRM.Noodle.BE.Share.Interfaces;
 using PRM.Noodle.BE.Share.Persistence;
 using PRM.Noodle.BE.Share.Repositories;
 using Services.Interfaces;
-using Services.Mappings;
-using Services.Services;
 using PRM.Noodle.BE.Service.Products.Controllers;
 using PRM.Noodle.BE.Service.Products.Services;
+using PRM.Noodle.BE.Service.Products.Mappings;
+using PRM.Noodle.BE.Service.Chats.Services;
+using PRM.Noodle.BE.Service.Toppings.Services;
+using PRM.Noodle.BE.Service.Toppings.Mappings;
+using PRM.Noodle.BE.Service.Combos.Services;
+using PRM.Noodle.BE.Service.Combos.Mappings;
+using PRM.Noodle.BE.Service.Orders.Services;
+using PRM.Noodle.BE.Service.Orders.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,17 +48,43 @@ builder.Services.AddDbContext<SpicyNoodleDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IComboService, ComboService>();
-builder.Services.AddScoped<IToppingService, ToppingService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+//builder.Services.AddScoped<IProductService, ProductService>();
+
+
+#region Register Controllers
+//builder.Services
+//    .AddControllers()
+//    .AddApplicationPart(typeof(ProductsController).Assembly);
+#endregion
+
+#region Register Mappings
+builder.Services
+    .AddAutoMapper(
+    typeof(ProductMappingProfile), 
+    typeof(ToppingMappingProfile), 
+    typeof(ComboMappingProfile),
+    typeof(OrderMappingProfile)
+    );
+
+#endregion  
+
+#region Register Services
+
 builder.Services.AddHttpClient<IChatService, ChatService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
-builder.Services.AddScoped<IProductsService, ProductsService>();
-builder.Services.AddControllers()
-    .AddApplicationPart(typeof(ProductsController).Assembly);
+builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<IToppingService, ToppingService>();
+
+builder.Services.AddScoped<IComboService, ComboService>();
+
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+#endregion
+
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -73,6 +105,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (true)
 {
+    app.UseDeveloperExceptionPage(); // <--- add this
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
