@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Repositories.Interfaces;
-using Repositories.Models;
-using Repositories.Persistence;
+using PRM.Noodle.BE.Share.Interfaces;
+using PRM.Noodle.BE.Share.Models;
 using Services.DTOs.Order;
 using Services.Interfaces;
 using System;

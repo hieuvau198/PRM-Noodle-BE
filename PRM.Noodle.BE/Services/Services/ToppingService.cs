@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Repositories.Interfaces;
-using Repositories.Models;
 using Services.DTOs.Topping;
 using Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using PRM.Noodle.BE.Share.Interfaces;
+using PRM.Noodle.BE.Share.Models;
 
 namespace Services.Services
 {

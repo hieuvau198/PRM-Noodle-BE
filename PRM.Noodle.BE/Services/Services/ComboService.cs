@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Repositories.Interfaces;
-using Repositories.Models;
+using PRM.Noodle.BE.Share.Interfaces;
+using PRM.Noodle.BE.Share.Models;
 using Services.DTOs.Combo;
 using Services.DTOs.Product;
 using Services.Interfaces;

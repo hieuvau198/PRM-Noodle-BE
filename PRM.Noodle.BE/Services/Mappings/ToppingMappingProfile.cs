@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Repositories.Models;
+using PRM.Noodle.BE.Share.Models;
 using Services.DTOs.Topping;
 
 namespace Services.Mappings

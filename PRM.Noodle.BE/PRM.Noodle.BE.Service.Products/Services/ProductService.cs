@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
+using PRM.Noodle.BE.Service.Products.Models;
 using PRM.Noodle.BE.Share.Interfaces;
 using PRM.Noodle.BE.Share.Models;
-using Services.DTOs.Product;
-using Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Services
+namespace PRM.Noodle.BE.Service.Products.Services
 {
     public class ProductService : IProductService
     {
@@ -59,9 +58,9 @@ namespace Services.Services
                 var searchLower = searchTerm.ToLower();
                 var searchFilter = new Func<Expression<Func<Product, bool>>, Expression<Func<Product, bool>>>(
                     expr => p => p.ProductName.ToLower().Contains(searchLower) ||
-                                (p.Description != null && p.Description.ToLower().Contains(searchLower)));
+                                p.Description != null && p.Description.ToLower().Contains(searchLower));
                 filter = filter.And(p => p.ProductName.ToLower().Contains(searchLower) ||
-                                        (p.Description != null && p.Description.ToLower().Contains(searchLower)));
+                                        p.Description != null && p.Description.ToLower().Contains(searchLower));
             }
 
             if (!string.IsNullOrWhiteSpace(spiceLevel))

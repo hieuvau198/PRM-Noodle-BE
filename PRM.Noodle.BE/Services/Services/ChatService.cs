@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Repositories.Interfaces;
-using Repositories.Models;
+using PRM.Noodle.BE.Share.Interfaces;
+using PRM.Noodle.BE.Share.Models;
 using Services.DTOs.AIChat;
 using Services.DTOs.Product;
 using Services.Interfaces;

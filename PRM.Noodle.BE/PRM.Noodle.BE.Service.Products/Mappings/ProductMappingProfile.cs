@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
+using PRM.Noodle.BE.Service.Products.Models;
 using PRM.Noodle.BE.Share.Models;
-using Services.DTOs.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Services.Mappings
+namespace PRM.Noodle.BE.Service.Products.Mappings
 {
     public class ProductMappingProfile : Profile
     {

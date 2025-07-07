@@ -1,13 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{61E6AA30-D0F9-4396-92A5-716E89A903D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.API", "PRM.Noodle.BE.API\PRM.Noodle.BE.API.csproj", "{61E6AA30-D0F9-4396-92A5-716E89A903D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Repositories\Repositories.csproj", "{AFBFF7A3-D685-4162-8C16-76B22456F615}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Share", "PRM.Noodle.BE.Share\PRM.Noodle.BE.Share.csproj", "{AFBFF7A3-D685-4162-8C16-76B22456F615}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Products", "PRM.Noodle.BE.Service.Products\PRM.Noodle.BE.Service.Products.csproj", "{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Orders", "PRM.Noodle.BE.Service.Orders\PRM.Noodle.BE.Service.Orders.csproj", "{35874E59-4F7E-4846-9A81-2267FE598B95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Combos", "PRM.Noodle.BE.Service.Combos\PRM.Noodle.BE.Service.Combos.csproj", "{A0353A41-A098-4322-B983-AFB4C0861E9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Toppings", "PRM.Noodle.BE.Service.Toppings\PRM.Noodle.BE.Service.Toppings.csproj", "{19090264-3BCE-438E-8868-1143A786C2A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Chats", "PRM.Noodle.BE.Service.Chats\PRM.Noodle.BE.Service.Chats.csproj", "{906F2B4C-E628-4749-A103-AB3B452B7E62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +37,26 @@ Global
 		{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FE2A1C5-ED14-41D7-AA9C-821BFC02F745}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBE0DA52-DE47-49AF-BE69-CEAA3117EBE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35874E59-4F7E-4846-9A81-2267FE598B95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35874E59-4F7E-4846-9A81-2267FE598B95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35874E59-4F7E-4846-9A81-2267FE598B95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35874E59-4F7E-4846-9A81-2267FE598B95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0353A41-A098-4322-B983-AFB4C0861E9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0353A41-A098-4322-B983-AFB4C0861E9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0353A41-A098-4322-B983-AFB4C0861E9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0353A41-A098-4322-B983-AFB4C0861E9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19090264-3BCE-438E-8868-1143A786C2A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19090264-3BCE-438E-8868-1143A786C2A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19090264-3BCE-438E-8868-1143A786C2A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19090264-3BCE-438E-8868-1143A786C2A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{906F2B4C-E628-4749-A103-AB3B452B7E62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{906F2B4C-E628-4749-A103-AB3B452B7E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{906F2B4C-E628-4749-A103-AB3B452B7E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{906F2B4C-E628-4749-A103-AB3B452B7E62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
