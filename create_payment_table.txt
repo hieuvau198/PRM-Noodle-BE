@@ -1,0 +1,52 @@
+-- Payment table
+CREATE TABLE payments (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    customer_user_id INT NULL,
+    customer_name VARCHAR(100) DEFAULT 'Anonymous',
+    staff_user_id INT NULL,
+    staff_name VARCHAR(100) DEFAULT 'Automatic',
+    payment_amount DECIMAL(10,2) NOT NULL,
+    payment_method ENUM('cash', 'card', 'digital_wallet') NOT NULL,
+    payment_status ENUM('pending', 'processing', 'complete') DEFAULT 'pending',
+    transaction_reference VARCHAR(100) NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    deletion_reason TEXT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP NULL,
+    completed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Foreign key constraints
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (customer_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (staff_user_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
+
+-- Sample payment insert for order_id 3
+INSERT INTO payments (
+    order_id, 
+    customer_user_id, 
+    customer_name, 
+    staff_user_id, 
+    staff_name, 
+    payment_amount, 
+    payment_method, 
+    payment_status,
+    payment_date,
+    processed_at,
+    completed_at
+) VALUES (
+    3,                              -- order_id
+    3,                              -- customer_user_id (customer01's user_id)
+    'Tran Van A',                   -- customer_name
+    2,                              -- staff_user_id (staff01's user_id)
+    'Staff Nguyen',                 -- staff_name
+    125000.00,                      -- payment_amount (matches order total)
+    'digital_wallet',               -- payment_method
+    'complete',                     -- payment_status
+    '2024-12-02 20:15:00',         -- payment_date
+    '2024-12-02 20:16:00',         -- processed_at
+    '2024-12-02 20:17:00'          -- completed_at
+);
