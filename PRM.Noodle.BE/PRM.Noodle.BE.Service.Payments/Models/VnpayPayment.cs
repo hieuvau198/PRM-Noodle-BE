@@ -21,8 +21,8 @@ namespace PRM.Noodle.BE.Service.Payments.Models
             // Khởi tạo giá trị cho _tmnCode, _hashSecret, _baseUrl, _callbackUrl tại đây.
             //_tmnCode = "UQILB436";
             //_hashSecret = "PRYYMYPQXXJKQVXAJTWLCRPJERZXSNWN";
-            _tmnCode = "0ZE53AQG";
-            _hashSecret = "U89C105M6Q347VMKQOUW0JSGDXIVO8BA";
+            _tmnCode = "WKQTPQQX";
+            _hashSecret = "P1Q8AZS0HQY13C1S4K492FV1FN4ZOQ48";
             _baseUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
             _callbackUrl = "https://prmnoodle.azurewebsites.net/index.html";
             _vnpay = new Vnpay();
