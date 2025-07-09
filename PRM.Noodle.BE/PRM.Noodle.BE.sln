@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Toppi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Chats", "PRM.Noodle.BE.Service.Chats\PRM.Noodle.BE.Service.Chats.csproj", "{906F2B4C-E628-4749-A103-AB3B452B7E62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Payments", "PRM.Noodle.BE.Service.Payments\PRM.Noodle.BE.Service.Payments.csproj", "{7D0DD4CD-FF08-4DD2-BA9C-1FA2FC2ABA16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{906F2B4C-E628-4749-A103-AB3B452B7E62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{906F2B4C-E628-4749-A103-AB3B452B7E62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{906F2B4C-E628-4749-A103-AB3B452B7E62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D0DD4CD-FF08-4DD2-BA9C-1FA2FC2ABA16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D0DD4CD-FF08-4DD2-BA9C-1FA2FC2ABA16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D0DD4CD-FF08-4DD2-BA9C-1FA2FC2ABA16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D0DD4CD-FF08-4DD2-BA9C-1FA2FC2ABA16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
