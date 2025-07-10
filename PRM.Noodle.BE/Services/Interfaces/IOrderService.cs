@@ -19,7 +19,8 @@ namespace Services.Interfaces
         Task<bool> ConfirmOrderAsync(int orderId);
         Task<bool> CompleteOrderAsync(int orderId);
         Task<bool> CancelOrderAsync(int orderId);
-
+        Task<bool> PrepareOrderAsync(int orderId);        
+        Task<bool> DeliverOrderAsync(int orderId);
         Task<PagedOrderResponse> GetTodayOrdersAsync(int page = 1, int pageSize = 10);
         Task<PagedOrderResponse> GetPendingOrdersAsync(int page = 1, int pageSize = 10);
         Task<RevenueReportDto> GetRevenueReportAsync(DateTime fromDate, DateTime toDate);

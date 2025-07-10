@@ -276,7 +276,7 @@ namespace Services.Services
         public async Task<bool> DeleteOrderAsync(int orderId)
         {
             var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
-            if (order == null || order.OrderStatus != "pending")
+            if (order == null)
                 return false;
 
             _unitOfWork.Orders.Remove(order);
@@ -301,10 +301,12 @@ namespace Services.Services
         public async Task<bool> CompleteOrderAsync(int orderId)
         {
             var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
-            if (order == null || (order.OrderStatus != "confirmed" && order.OrderStatus != "preparing" && order.OrderStatus != "ready"))
+
+            // KHÔNG cho phép complete nếu đã completed hoặc đã cancelled
+            if (order == null || order.OrderStatus == "completed" || order.OrderStatus == "cancelled")
                 return false;
 
-            order.OrderStatus = "delivered";
+            order.OrderStatus = "completed";
             order.CompletedAt = DateTime.Now;
 
             _unitOfWork.Orders.Update(order);
@@ -315,11 +317,11 @@ namespace Services.Services
         public async Task<bool> CancelOrderAsync(int orderId)
         {
             var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
-            if (order == null || order.OrderStatus == "delivered" || order.OrderStatus == "cancelled")
+
+            if (order == null || order.OrderStatus != "pending")
                 return false;
 
             order.OrderStatus = "cancelled";
-
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync();
             return true;
@@ -359,7 +361,7 @@ namespace Services.Services
                 .Where(o => o.OrderDate.HasValue && o.OrderDate >= fromDate && o.OrderDate <= toDate)
                 .ToListAsync();
 
-            var completedOrders = orders.Where(o => o.OrderStatus == "delivered").ToList();
+            var completedOrders = orders.Where(o => o.OrderStatus == "completed").ToList();
             var cancelledOrders = orders.Where(o => o.OrderStatus == "cancelled").ToList();
 
             var totalRevenue = completedOrders.Sum(o => o.TotalAmount);
@@ -410,7 +412,7 @@ namespace Services.Services
         {
             return new OrderStatusesDto
             {
-                OrderStatuses = new List<string> { "pending", "confirmed", "preparing",  "delivered", "cancelled" },
+                OrderStatuses = new List<string> { "pending", "confirmed", "preparing", "delivered", "completed", "cancelled" },
                 PaymentStatuses = new List<string> { "pending", "paid", "failed" },
                 PaymentMethods = new List<string> { "cash", "card", "digital_wallet" }
             };
@@ -734,6 +736,31 @@ namespace Services.Services
                 await _unitOfWork.RollbackTransactionAsync();
                 throw;
             }
+        }
+        public async Task<bool> PrepareOrderAsync(int orderId)
+        {
+            var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+            if (order == null || order.OrderStatus != "confirmed")
+                return false;
+
+            order.OrderStatus = "preparing";
+   
+
+            _unitOfWork.Orders.Update(order);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> DeliverOrderAsync(int orderId)
+        {
+            var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+            if (order == null || (order.OrderStatus != "preparing" ))
+                return false;
+
+            order.OrderStatus = "ready"; 
+            _unitOfWork.Orders.Update(order);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 }
