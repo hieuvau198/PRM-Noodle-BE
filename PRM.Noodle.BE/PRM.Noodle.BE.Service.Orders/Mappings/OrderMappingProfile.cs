@@ -19,7 +19,8 @@ namespace PRM.Noodle.BE.Service.Orders.Mappings
                 .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(dest => dest.TotalAmount, opt => opt.Ignore())
                 .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
-                .ForMember(dest => dest.OrderCombos, opt => opt.Ignore());
+                .ForMember(dest => dest.OrderCombos, opt => opt.Ignore())
+                .ForMember(dest => dest.Payments, opt => opt.Ignore());
 
             CreateMap<Order, OrderDto>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))

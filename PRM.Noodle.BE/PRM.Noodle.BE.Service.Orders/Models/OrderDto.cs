@@ -20,7 +20,6 @@ namespace PRM.Noodle.BE.Service.Orders.Models
         public DateTime? OrderDate { get; set; }
         public DateTime? ConfirmedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
-
         public List<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
         public List<OrderComboDto> OrderCombos { get; set; } = new List<OrderComboDto>();
     }
