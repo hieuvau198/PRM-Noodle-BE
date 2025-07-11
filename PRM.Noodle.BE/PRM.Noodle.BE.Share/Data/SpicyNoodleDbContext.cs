@@ -31,12 +31,13 @@ public partial class SpicyNoodleDbContext : DbContext
 
     public virtual DbSet<OrderItemTopping> OrderItemToppings { get; set; }
 
+    public virtual DbSet<Payment> Payments { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<Topping> Toppings { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -288,6 +289,84 @@ public partial class SpicyNoodleDbContext : DbContext
                 .HasForeignKey(d => d.ToppingId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("order_item_toppings_ibfk_2");
+        });
+
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.HasKey(e => e.PaymentId).HasName("PRIMARY");
+
+            entity.ToTable("payments");
+
+            entity.HasIndex(e => e.CustomerUserId, "customer_user_id");
+
+            entity.HasIndex(e => e.OrderId, "order_id");
+
+            entity.HasIndex(e => e.StaffUserId, "staff_user_id");
+
+            entity.Property(e => e.PaymentId).HasColumnName("payment_id");
+            entity.Property(e => e.CompletedAt)
+                .HasColumnType("timestamp")
+                .HasColumnName("completed_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CustomerName)
+                .HasMaxLength(100)
+                .HasDefaultValueSql("'Anonymous'")
+                .HasColumnName("customer_name");
+            entity.Property(e => e.CustomerUserId).HasColumnName("customer_user_id");
+            entity.Property(e => e.DeletionReason)
+                .HasColumnType("text")
+                .HasColumnName("deletion_reason");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.PaymentAmount)
+                .HasPrecision(10, 2)
+                .HasColumnName("payment_amount");
+            entity.Property(e => e.PaymentDate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("payment_date");
+            entity.Property(e => e.PaymentMethod)
+                .HasColumnType("enum('cash','card','digital_wallet')")
+                .HasColumnName("payment_method");
+            entity.Property(e => e.PaymentStatus)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','processing','complete')")
+                .HasColumnName("payment_status");
+            entity.Property(e => e.ProcessedAt)
+                .HasColumnType("timestamp")
+                .HasColumnName("processed_at");
+            entity.Property(e => e.StaffName)
+                .HasMaxLength(100)
+                .HasDefaultValueSql("'Automatic'")
+                .HasColumnName("staff_name");
+            entity.Property(e => e.StaffUserId).HasColumnName("staff_user_id");
+            entity.Property(e => e.TransactionReference)
+                .HasMaxLength(100)
+                .HasColumnName("transaction_reference");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
+
+            entity.HasOne(d => d.CustomerUser).WithMany(p => p.PaymentCustomerUsers)
+                .HasForeignKey(d => d.CustomerUserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("payments_ibfk_2");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("payments_ibfk_1");
+
+            entity.HasOne(d => d.StaffUser).WithMany(p => p.PaymentStaffUsers)
+                .HasForeignKey(d => d.StaffUserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("payments_ibfk_3");
         });
 
         modelBuilder.Entity<Product>(entity =>
