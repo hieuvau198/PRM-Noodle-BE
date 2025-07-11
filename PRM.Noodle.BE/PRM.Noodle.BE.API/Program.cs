@@ -13,6 +13,12 @@ using PRM.Noodle.BE.Service.Combos.Services;
 using PRM.Noodle.BE.Service.Combos.Mappings;
 using PRM.Noodle.BE.Service.Orders.Services;
 using PRM.Noodle.BE.Service.Orders.Mappings;
+using PRM.Noodle.BE.Service.Users.Mappings;
+using PRM.Noodle.BE.Service.Users.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,39 +27,83 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+#region Add Sign-in UI for Swagger page
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+
+    // Add JWT token support to Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Title = "Spicy Noodle API",
-        Version = "v1",
-        Description = "API for Spicy Noodle Restaurant Management System"
+        In = ParameterLocation.Header,
+        Description = "Please insert Access Token with 'Bearer ' prefix, Ex: 'Bearer ABCXYZ'",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
 
-    // Include XML comments if you have them
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        c.IncludeXmlComments(xmlPath);
-    }
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
+
+#endregion
+
+#region Configure DbContext
 
 builder.Services.AddDbContext<SpicyNoodleDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     ));
+#endregion
+
+#region Configure JWT Authentication
+
+// Configure JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"] ??
+                throw new InvalidOperationException("JWT Secret is not configured"))
+        ),
+        ClockSkew = TimeSpan.Zero // Optional: removes default 5-minute tolerance
+    };
+});
+
+// Add Authorization
+builder.Services.AddAuthorization();
+#endregion
+
+#region Register Repositories
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-//builder.Services.AddScoped<IProductService, ProductService>();
-
-
-#region Register Controllers
-//builder.Services
-//    .AddControllers()
-//    .AddApplicationPart(typeof(ProductsController).Assembly);
 #endregion
 
 #region Register Mappings
@@ -62,7 +112,8 @@ builder.Services
     typeof(ProductMappingProfile), 
     typeof(ToppingMappingProfile), 
     typeof(ComboMappingProfile),
-    typeof(OrderMappingProfile)
+    typeof(OrderMappingProfile),
+    typeof(UserMappingProfile)
     );
 
 #endregion  
@@ -80,8 +131,15 @@ builder.Services.AddScoped<IComboService, ComboService>();
 
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 #endregion
 
+#region Register Controllers
+//builder.Services
+//    .AddControllers()
+//    .AddApplicationPart(typeof(ProductsController).Assembly);
+#endregion
 
 
 
@@ -116,6 +174,8 @@ if (true)
 app.UseHttpsRedirection();
 
 app.UseCors("AllowSpecificOrigin");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
