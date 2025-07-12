@@ -164,7 +164,7 @@ namespace PRM.Noodle.BE.Service.Orders.Controllers
 
                 var result = await _orderService.DeleteOrderAsync(orderId);
                 if (!result)
-                    return BadRequest(new { message = "Order cannot be deleted. Order not found or status is not pending." });
+                    return BadRequest(new { message = "Order not found ." });
 
                 return Ok(new { message = "Order deleted successfully." });
             }
@@ -221,6 +221,56 @@ namespace PRM.Noodle.BE.Service.Orders.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while completing the order.", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Chuyển đơn hàng sang trạng thái chuẩn bị (từ confirmed sang preparing)
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng</param>
+        /// <returns>Kết quả chuyển trạng thái</returns>
+        [HttpPatch("{orderId}/prepare")]
+        public async Task<ActionResult> PrepareOrder(int orderId)
+        {
+            try
+            {
+                if (orderId <= 0)
+                    return BadRequest(new { message = "Invalid order ID." });
+
+                var result = await _orderService.PrepareOrderAsync(orderId);
+                if (!result)
+                    return BadRequest(new { message = "Order cannot be prepared. Order not found or invalid status (must be confirmed)." });
+
+                return Ok(new { message = "Order preparation started successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while preparing the order.", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Chuyển đơn hàng sang trạng thái sẵn sàng giao/vận chuyển (từ preparing sang ready)
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng</param>
+        /// <returns>Kết quả chuyển trạng thái</returns>
+        [HttpPatch("{orderId}/deliver")]
+        public async Task<ActionResult> DeliverOrder(int orderId)
+        {
+            try
+            {
+                if (orderId <= 0)
+                    return BadRequest(new { message = "Invalid order ID." });
+
+                var result = await _orderService.DeliverOrderAsync(orderId);
+                if (!result)
+                    return BadRequest(new { message = "Order cannot be set for delivery. Order not found or invalid status (must be preparing)." }); // ✅ SỬA
+
+                return Ok(new { message = "Order is ready for delivery." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while setting order for delivery.", details = ex.Message });
             }
         }
 

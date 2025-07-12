@@ -15,6 +15,8 @@ namespace PRM.Noodle.BE.Service.Orders.Services
         Task<PagedOrderResponse> GetOrdersByUserIdAsync(int userId, int page = 1, int pageSize = 10);
         Task<OrderDto?> GetOrderByIdAsync(int orderId);
         Task<OrderDto?> UpdateOrderAsync(int orderId, UpdateOrderDto updateOrderDto);
+        Task<bool> PrepareOrderAsync(int orderId);
+        Task<bool> DeliverOrderAsync(int orderId);
         Task<bool> DeleteOrderAsync(int orderId);
         Task<bool> ConfirmOrderAsync(int orderId);
         Task<bool> CompleteOrderAsync(int orderId);
