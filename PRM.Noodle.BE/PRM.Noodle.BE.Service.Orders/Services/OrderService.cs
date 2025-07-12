@@ -302,10 +302,10 @@ namespace PRM.Noodle.BE.Service.Orders.Services
             var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
 
             // KHÔNG cho phép complete nếu đã completed hoặc đã cancelled
-            if (order == null || order.OrderStatus == "completed" || order.OrderStatus == "cancelled")
+            if (order == null || order.OrderStatus == "delivered" || order.OrderStatus == "cancelled")
                 return false;
 
-            order.OrderStatus = "completed";
+            order.OrderStatus = "delivered";
             order.CompletedAt = DateTime.Now;
 
             _unitOfWork.Orders.Update(order);
