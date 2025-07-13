@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using PRM.Noodle.BE.Service.Payments.Services;
+using PRM.Noodle.BE.Service.Payments.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,7 +115,8 @@ builder.Services
     typeof(ToppingMappingProfile), 
     typeof(ComboMappingProfile),
     typeof(OrderMappingProfile),
-    typeof(UserMappingProfile)
+    typeof(UserMappingProfile),
+    typeof(PaymentMappingProfile)
     );
 
 #endregion  
@@ -132,6 +135,9 @@ builder.Services.AddScoped<IComboService, ComboService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 #endregion
 
