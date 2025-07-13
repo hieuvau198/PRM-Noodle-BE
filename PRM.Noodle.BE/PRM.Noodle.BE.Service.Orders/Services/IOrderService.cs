@@ -24,6 +24,12 @@ namespace PRM.Noodle.BE.Service.Orders.Services
 
         Task<PagedOrderResponse> GetTodayOrdersAsync(int page = 1, int pageSize = 10);
         Task<PagedOrderResponse> GetPendingOrdersAsync(int page = 1, int pageSize = 10);
+        Task<PagedOrderResponse> GetConfirmedOrdersAsync(int page = 1, int pageSize = 10);
+        Task<PagedOrderResponse> GetPreparingOrdersAsync(int page = 1, int pageSize = 10);
+        Task<PagedOrderResponse> GetDeliveredOrdersAsync(int page = 1, int pageSize = 10);
+        Task<PagedOrderResponse> GetCompletedOrdersAsync(int page = 1, int pageSize = 10);
+        Task<PagedOrderResponse> GetCancelledOrdersAsync(int page = 1, int pageSize = 10);
+
         Task<RevenueReportDto> GetRevenueReportAsync(DateTime fromDate, DateTime toDate);
         OrderStatusesDto GetOrderStatuses();
 

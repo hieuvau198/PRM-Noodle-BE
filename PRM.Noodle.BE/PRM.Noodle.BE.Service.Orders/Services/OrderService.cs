@@ -353,7 +353,62 @@ namespace PRM.Noodle.BE.Service.Orders.Services
 
             return await GetOrdersAsync(queryDto);
         }
+        public async Task<PagedOrderResponse> GetConfirmedOrdersAsync(int page = 1, int pageSize = 10)
+        {
+            var queryDto = new OrderQueryDto
+            {
+                Page = page,
+                PageSize = pageSize,
+                OrderStatus = "confirmed"
+            };
 
+            return await GetOrdersAsync(queryDto);
+        }
+      
+        public async Task<PagedOrderResponse> GetPreparingOrdersAsync(int page = 1, int pageSize = 10)
+        {
+            var queryDto = new OrderQueryDto
+            {
+                Page = page,
+                PageSize = pageSize,
+                OrderStatus = "Preparing"
+            };
+
+            return await GetOrdersAsync(queryDto);
+        }
+        public async Task<PagedOrderResponse> GetDeliveredOrdersAsync(int page = 1, int pageSize = 10)
+        {
+            var queryDto = new OrderQueryDto
+            {
+                Page = page,
+                PageSize = pageSize,
+                OrderStatus = "Ready"
+            };
+
+            return await GetOrdersAsync(queryDto);
+        }
+        public async Task<PagedOrderResponse> GetCompletedOrdersAsync(int page = 1, int pageSize = 10)
+        {
+            var queryDto = new OrderQueryDto
+            {
+                Page = page,
+                PageSize = pageSize,
+                OrderStatus = "Delivered"
+            };
+
+            return await GetOrdersAsync(queryDto);
+        }
+        public async Task<PagedOrderResponse> GetCancelledOrdersAsync(int page = 1, int pageSize = 10)
+        {
+            var queryDto = new OrderQueryDto
+            {
+                Page = page,
+                PageSize = pageSize,
+                OrderStatus = "Cancelled"
+            };
+
+            return await GetOrdersAsync(queryDto);
+        }
         public async Task<RevenueReportDto> GetRevenueReportAsync(DateTime fromDate, DateTime toDate)
         {
             var orders = await _unitOfWork.Orders.GetQueryable()

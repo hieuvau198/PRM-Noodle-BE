@@ -336,6 +336,105 @@ namespace PRM.Noodle.BE.Service.Orders.Controllers
                 return StatusCode(500, new { message = "An error occurred while retrieving pending orders.", details = ex.Message });
             }
         }
+        [HttpGet("confirmed")]
+        public async Task<ActionResult<PagedOrderResponse>> GetConfirmedOrders(
+         [FromQuery] int page = 1,
+         [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                if (page < 1) page = 1;
+                if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+                var result = await _orderService.GetConfirmedOrdersAsync(page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving pending orders.", details = ex.Message });
+            }
+        }
+
+
+
+        [HttpGet("Preparing")]
+        public async Task<ActionResult<PagedOrderResponse>> GetPreparingOrders(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                if (page < 1) page = 1;
+                if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+                var result = await _orderService.GetPreparingOrdersAsync(page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving Preparing orders.", details = ex.Message });
+            }
+        }
+
+        [HttpGet("Delivered")]
+        public async Task<ActionResult<PagedOrderResponse>> GetDeliveredOrders(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                if (page < 1) page = 1;
+                if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+                var result = await _orderService.GetDeliveredOrdersAsync(page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving Delivered orders.", details = ex.Message });
+            }
+        }
+
+        [HttpGet("Completed")]
+        public async Task<ActionResult<PagedOrderResponse>> GetCompletedOrders(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                if (page < 1) page = 1;
+                if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+                var result = await _orderService.GetCompletedOrdersAsync(page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving Completed orders.", details = ex.Message });
+            }
+        }
+
+
+        [HttpGet("Cancelled")]
+        public async Task<ActionResult<PagedOrderResponse>> GetCancelledOrders(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                if (page < 1) page = 1;
+                if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+                var result = await _orderService.GetCancelledOrdersAsync(page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving Cancelled orders.", details = ex.Message });
+            }
+        }
+
+
 
         [HttpGet("revenue")]
         public async Task<ActionResult<RevenueReportDto>> GetRevenueReport(
