@@ -1,0 +1,146 @@
+erDiagram
+    users {
+        INT user_id PK
+        VARCHAR username UK
+        VARCHAR email UK
+        VARCHAR password
+        VARCHAR full_name
+        VARCHAR phone
+        TEXT address
+        ENUM role
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    products {
+        INT product_id PK
+        VARCHAR product_name
+        TEXT description
+        DECIMAL base_price
+        VARCHAR image_url
+        BOOLEAN is_available
+        ENUM spice_level
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    toppings {
+        INT topping_id PK
+        VARCHAR topping_name
+        DECIMAL price
+        TEXT description
+        BOOLEAN is_available
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    combos {
+        INT combo_id PK
+        VARCHAR combo_name
+        TEXT description
+        DECIMAL combo_price
+        VARCHAR image_url
+        BOOLEAN is_available
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    combo_products {
+        INT combo_product_id PK
+        INT combo_id FK
+        INT product_id FK
+        INT quantity
+    }
+
+    orders {
+        INT order_id PK
+        INT user_id FK
+        ENUM order_status
+        DECIMAL total_amount
+        ENUM payment_method
+        ENUM payment_status
+        TEXT delivery_address
+        TEXT notes
+        TIMESTAMP order_date
+        TIMESTAMP confirmed_at
+        TIMESTAMP completed_at
+    }
+
+    order_items {
+        INT order_item_id PK
+        INT order_id FK
+        INT product_id FK
+        INT quantity
+        DECIMAL unit_price
+        DECIMAL subtotal
+    }
+
+    order_item_toppings {
+        INT order_item_topping_id PK
+        INT order_item_id FK
+        INT topping_id FK
+        INT quantity
+        DECIMAL unit_price
+        DECIMAL subtotal
+    }
+
+    order_combos {
+        INT order_combo_id PK
+        INT order_id FK
+        INT combo_id FK
+        INT quantity
+        DECIMAL unit_price
+        DECIMAL subtotal
+    }
+
+    payments {
+        INT payment_id PK
+        INT order_id FK
+        INT customer_user_id FK
+        VARCHAR customer_name
+        INT staff_user_id FK
+        VARCHAR staff_name
+        DECIMAL payment_amount
+        ENUM payment_method
+        ENUM payment_status
+        VARCHAR transaction_reference
+        BOOLEAN is_deleted
+        TEXT deletion_reason
+        TIMESTAMP payment_date
+        TIMESTAMP processed_at
+        TIMESTAMP completed_at
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    daily_revenue {
+        INT revenue_id PK
+        DATE revenue_date UK
+        INT total_orders
+        DECIMAL total_revenue
+        DECIMAL cash_revenue
+        DECIMAL card_revenue
+        DECIMAL digital_wallet_revenue
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    %% Relationships
+    users ||--o{ orders : "places"
+    orders ||--o{ order_items : "contains"
+    orders ||--o{ order_combos : "contains"
+    orders ||--o{ payments : "has"
+    
+    products ||--o{ order_items : "ordered_as"
+    products ||--o{ combo_products : "included_in"
+    
+    toppings ||--o{ order_item_toppings : "added_to"
+    
+    combos ||--o{ combo_products : "includes"
+    combos ||--o{ order_combos : "ordered_as"
+    
+    order_items ||--o{ order_item_toppings : "has"
+    
+    users ||--o{ payments : "customer"
+    users ||--o{ payments : "staff"
