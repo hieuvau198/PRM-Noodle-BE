@@ -29,6 +29,46 @@ namespace PRM.Noodle.BE.Service.Users.Services
             return _mapper.Map<IEnumerable<UserDto>>(sortedUsers);
         }
 
+        public async Task<PagedUserResponse> GetUsersAsync(UserQueryDto queryDto)
+        {
+            var query = _unitOfWork.Users.GetQueryable().AsQueryable();
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(queryDto.Role))
+                query = query.Where(u => u.Role == queryDto.Role);
+
+            if (queryDto.IsActive.HasValue)
+                query = query.Where(u => u.IsActive == queryDto.IsActive.Value);
+
+            if (!string.IsNullOrEmpty(queryDto.SearchTerm))
+            {
+                var searchTerm = queryDto.SearchTerm.ToLower();
+                query = query.Where(u => u.Username.ToLower().Contains(searchTerm) ||
+                                        u.Email.ToLower().Contains(searchTerm));
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var users = await query
+                .OrderBy(u => u.UserId)
+                .Skip((queryDto.Page - 1) * queryDto.PageSize)
+                .Take(queryDto.PageSize)
+                .ToListAsync();
+
+            var userDtos = _mapper.Map<List<UserDto>>(users);
+
+            return new PagedUserResponse
+            {
+                Users = userDtos,
+                TotalCount = totalCount,
+                Page = queryDto.Page,
+                PageSize = queryDto.PageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)queryDto.PageSize)
+            };
+        }
+
         public async Task<UserDto?> GetUserByIdAsync(int userId)
         {
             var user = await _unitOfWork.Users.GetByIdAsync(userId);

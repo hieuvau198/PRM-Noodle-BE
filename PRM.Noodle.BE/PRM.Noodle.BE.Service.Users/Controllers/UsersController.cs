@@ -37,6 +37,24 @@ namespace PRM.Noodle.BE.Service.Users.Controllers
             }
         }
 
+        [HttpGet("paged")]
+        //[Authorize(Roles = "Admin")] // Only admins can get paginated users
+        public async Task<ActionResult<PagedUserResponse>> GetUsersWithPaging([FromQuery] UserQueryDto queryDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var result = await _userService.GetUsersAsync(queryDto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+            }
+        }
+
         [HttpGet("{id}")]
         //[Authorize(Roles = "Admin")] // Only admins can get user by ID
         public async Task<ActionResult<UserDto>> GetUserById(int id)

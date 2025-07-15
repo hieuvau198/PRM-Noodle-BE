@@ -10,6 +10,7 @@ namespace PRM.Noodle.BE.Service.Users.Services
     public interface IUserService
     {
         Task<IEnumerable<UserDto>> GetAllUsersAsync();
+        Task<PagedUserResponse> GetUsersAsync(UserQueryDto queryDto);
         Task<UserDto?> GetUserByIdAsync(int userId);
         Task<UserDto> CreateUserAsync(CreateUserDto createUserDto);
         Task<UserDto?> UpdateUserAsync(int userId, UpdateUserDto updateUserDto);
