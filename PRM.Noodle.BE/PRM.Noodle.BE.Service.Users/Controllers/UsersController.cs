@@ -90,7 +90,7 @@ namespace PRM.Noodle.BE.Service.Users.Controllers
         }
 
         [HttpGet("inactive")]
-        //[Authorize(Roles = "Admin")] // Only admins can get inactive users
+        [Authorize(Roles = "admin")] // Only admins can get inactive users
         public async Task<ActionResult<IEnumerable<UserDto>>> GetInactiveUsers()
         {
             try
@@ -127,7 +127,7 @@ namespace PRM.Noodle.BE.Service.Users.Controllers
         }
 
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")] // Only admins can update users
+        [Authorize(Roles = "admin")] // Only admins can update users
         public async Task<ActionResult<UserDto>> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
             try
