@@ -264,5 +264,52 @@ namespace PRM.Noodle.BE.Service.Reports.Services
                 TotalOrdered = tp.TotalOrdered
             });
         }
+
+        public async Task<int> GetTotalOrdersAsync()
+        {
+            var orders = await _uow.Orders.GetAllAsync();
+            return orders.Count();
+        }
+
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            var orders = await _uow.Orders.GetAllAsync();
+            return orders.Sum(o => o.TotalAmount);
+        }
+
+        public async Task<TopProductDto> GetMostOrderedProductAsync()
+        {
+            var orderItems = await _uow.OrderItems.GetAllAsync();
+            var products = await _uow.Products.GetAllAsync();
+
+            var mostOrderedProduct = orderItems
+                .GroupBy(oi => oi.ProductId)
+                .Select(g => new
+                {
+                    ProductId = g.Key,
+                    TotalOrdered = g.Sum(oi => oi.Quantity ?? 0)
+                })
+                .OrderByDescending(x => x.TotalOrdered)
+                .FirstOrDefault();
+
+            if (mostOrderedProduct == null)
+            {
+                return new TopProductDto
+                {
+                    ProductId = 0,
+                    ProductName = "No orders found",
+                    TotalOrdered = 0
+                };
+            }
+
+            var product = products.FirstOrDefault(p => p.ProductId == mostOrderedProduct.ProductId);
+
+            return new TopProductDto
+            {
+                ProductId = mostOrderedProduct.ProductId,
+                ProductName = product?.ProductName ?? "Unknown Product",
+                TotalOrdered = mostOrderedProduct.TotalOrdered
+            };
+        }
     }
 }

@@ -18,5 +18,8 @@ namespace PRM.Noodle.BE.Service.Reports.Services
         Task<IEnumerable<DailyOrderCountDto>> GetLast7DaysOrderCountAsync();
         Task<int> GetTodayOrderCountAsync();
         Task<IEnumerable<TopProductDto>> GetTop5ProductsAsync();
+        Task<int> GetTotalOrdersAsync();
+        Task<decimal> GetTotalRevenueAsync();
+        Task<TopProductDto> GetMostOrderedProductAsync();
     }
 }

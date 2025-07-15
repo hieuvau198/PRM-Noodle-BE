@@ -215,5 +215,47 @@ namespace PRM.Noodle.BE.Service.Reports.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet("orders/total")]
+        public async Task<ActionResult<int>> GetTotalOrders()
+        {
+            try
+            {
+                var result = await _reportService.GetTotalOrdersAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("revenue/total")]
+        public async Task<ActionResult<decimal>> GetTotalRevenue()
+        {
+            try
+            {
+                var result = await _reportService.GetTotalRevenueAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("products/most-ordered")]
+        public async Task<ActionResult<TopProductDto>> GetMostOrderedProduct()
+        {
+            try
+            {
+                var result = await _reportService.GetMostOrderedProductAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }
