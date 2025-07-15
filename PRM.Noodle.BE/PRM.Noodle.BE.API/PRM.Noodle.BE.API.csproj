@@ -17,6 +17,7 @@
     <ProjectReference Include="..\PRM.Noodle.BE.Service.Orders\PRM.Noodle.BE.Service.Orders.csproj" />
     <ProjectReference Include="..\PRM.Noodle.BE.Service.Payments\PRM.Noodle.BE.Service.Payments.csproj" />
     <ProjectReference Include="..\PRM.Noodle.BE.Service.Products\PRM.Noodle.BE.Service.Products.csproj" />
+    <ProjectReference Include="..\PRM.Noodle.BE.Service.Reports\PRM.Noodle.BE.Service.Reports.csproj" />
     <ProjectReference Include="..\PRM.Noodle.BE.Service.Toppings\PRM.Noodle.BE.Service.Toppings.csproj" />
     <ProjectReference Include="..\PRM.Noodle.BE.Service.Users\PRM.Noodle.BE.Service.Users.csproj" />
   </ItemGroup>

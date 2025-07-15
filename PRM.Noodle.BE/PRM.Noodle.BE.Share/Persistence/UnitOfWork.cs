@@ -26,6 +26,7 @@ namespace PRM.Noodle.BE.Share.Persistence
         public IGenericRepository<OrderCombo> OrderCombos { get; private set; }
         public IGenericRepository<DailyRevenue> DailyRevenues { get; private set; }
         public IGenericRepository<OrderItemTopping> OrderItemTopping { get; private set; }
+        public IGenericRepository<Payment> Payments { get; private set; }
 
         public UnitOfWork(SpicyNoodleDbContext context,
                           IUserRepository userRepository)
@@ -40,6 +41,7 @@ namespace PRM.Noodle.BE.Share.Persistence
             OrderItems = new GenericRepository<OrderItem>(_context);
             OrderCombos = new GenericRepository<OrderCombo>(_context);
             OrderItemTopping = new GenericRepository<OrderItemTopping>(_context);
+            Payments = new GenericRepository<Payment>(_context);
             DailyRevenues = new GenericRepository<DailyRevenue>(_context);
         }
 

@@ -17,19 +17,16 @@ namespace PRM.Noodle.BE.Service.Payments.Services
 {
     public class PaymentService : IPaymentService
     {
-        private readonly IGenericRepository<Payment> _paymentRepo;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly VnpayPayment _vnpayPayment;
 
         public PaymentService(
-            IGenericRepository<Payment> paymentRepo,
             IUnitOfWork uow,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor)
         {
-            _paymentRepo = paymentRepo;
             _uow = uow;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -39,7 +36,7 @@ namespace PRM.Noodle.BE.Service.Payments.Services
         // Basic CRUD operations
         public async Task<IEnumerable<PaymentDto>> GetAllAsync()
         {
-            var payments = await _paymentRepo.GetAllAsync();
+            var payments = await _uow.Payments.GetAllAsync();
             return _mapper.Map<IEnumerable<PaymentDto>>(payments);
         }
 
@@ -47,7 +44,7 @@ namespace PRM.Noodle.BE.Service.Payments.Services
             int page, int pageSize, string searchTerm = null, string paymentStatus = null,
             string paymentMethod = null, int? orderId = null, int? customerId = null)
         {
-            var query = _paymentRepo.GetQueryable()
+            var query = _uow.Payments.GetQueryable()
                 .Where(p => p.IsDeleted != true);
 
             if (!string.IsNullOrEmpty(searchTerm))
@@ -82,49 +79,60 @@ namespace PRM.Noodle.BE.Service.Payments.Services
 
         public async Task<PaymentDto> GetByIdAsync(int id)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             return payment == null ? null : _mapper.Map<PaymentDto>(payment);
         }
 
         public async Task<PaymentDto> CreateAsync(CreatePaymentDto dto)
         {
             var payment = _mapper.Map<Payment>(dto);
-            await _paymentRepo.AddAsync(payment);
+            await _uow.Payments.AddAsync(payment);
             await _uow.CompleteAsync();
             return _mapper.Map<PaymentDto>(payment);
         }
 
         public async Task<PaymentDto> UpdateAsync(int id, UpdatePaymentDto dto)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return null;
 
+            var wasCompleted = payment.PaymentStatus == "complete";
+
             _mapper.Map(dto, payment);
-            _paymentRepo.Update(payment);
+            payment.UpdatedAt = DateTime.UtcNow;
+
+            _uow.Payments.Update(payment);
+
+            // Update daily revenue if payment status changed to complete
+            if (!wasCompleted && payment.PaymentStatus == "complete")
+            {
+                await UpdateDailyRevenueAsync(payment);
+            }
+
             await _uow.CompleteAsync();
             return _mapper.Map<PaymentDto>(payment);
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return false;
 
-            _paymentRepo.Remove(payment);
+            _uow.Payments.Remove(payment);
             await _uow.CompleteAsync();
             return true;
         }
 
         public async Task<bool> SoftDeleteAsync(int id, PaymentDeleteDto dto)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return false;
 
             payment.IsDeleted = true;
             payment.DeletionReason = dto.DeletionReason;
             payment.UpdatedAt = DateTime.UtcNow;
 
-            _paymentRepo.Update(payment);
+            _uow.Payments.Update(payment);
             await _uow.CompleteAsync();
             return true;
         }
@@ -132,31 +140,31 @@ namespace PRM.Noodle.BE.Service.Payments.Services
         // Payment-specific operations
         public async Task<IEnumerable<PaymentDto>> GetByOrderIdAsync(int orderId)
         {
-            var payments = await _paymentRepo.FindAsync(p => p.OrderId == orderId && p.IsDeleted != true);
+            var payments = await _uow.Payments.FindAsync(p => p.OrderId == orderId && p.IsDeleted != true);
             return _mapper.Map<IEnumerable<PaymentDto>>(payments);
         }
 
         public async Task<IEnumerable<PaymentDto>> GetByCustomerIdAsync(int customerId)
         {
-            var payments = await _paymentRepo.FindAsync(p => p.CustomerUserId == customerId && p.IsDeleted != true);
+            var payments = await _uow.Payments.FindAsync(p => p.CustomerUserId == customerId && p.IsDeleted != true);
             return _mapper.Map<IEnumerable<PaymentDto>>(payments);
         }
 
         public async Task<IEnumerable<PaymentDto>> GetByPaymentStatusAsync(string paymentStatus)
         {
-            var payments = await _paymentRepo.FindAsync(p => p.PaymentStatus == paymentStatus && p.IsDeleted != true);
+            var payments = await _uow.Payments.FindAsync(p => p.PaymentStatus == paymentStatus && p.IsDeleted != true);
             return _mapper.Map<IEnumerable<PaymentDto>>(payments);
         }
 
         public async Task<IEnumerable<PaymentDto>> GetByPaymentMethodAsync(string paymentMethod)
         {
-            var payments = await _paymentRepo.FindAsync(p => p.PaymentMethod == paymentMethod && p.IsDeleted != true);
+            var payments = await _uow.Payments.FindAsync(p => p.PaymentMethod == paymentMethod && p.IsDeleted != true);
             return _mapper.Map<IEnumerable<PaymentDto>>(payments);
         }
 
         public async Task<IEnumerable<PaymentDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
-            var payments = await _paymentRepo.FindAsync(p =>
+            var payments = await _uow.Payments.FindAsync(p =>
                 p.PaymentDate >= startDate &&
                 p.PaymentDate <= endDate &&
                 p.IsDeleted != true);
@@ -166,8 +174,10 @@ namespace PRM.Noodle.BE.Service.Payments.Services
         // Status management
         public async Task<bool> UpdatePaymentStatusAsync(int id, PaymentStatusUpdateDto dto)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return false;
+
+            var wasCompleted = payment.PaymentStatus == "complete";
 
             payment.PaymentStatus = dto.PaymentStatus;
             payment.TransactionReference = dto.TransactionReference ?? payment.TransactionReference;
@@ -175,126 +185,167 @@ namespace PRM.Noodle.BE.Service.Payments.Services
             payment.CompletedAt = dto.CompletedAt ?? payment.CompletedAt;
             payment.UpdatedAt = DateTime.UtcNow;
 
-            _paymentRepo.Update(payment);
+            _uow.Payments.Update(payment);
+
+            // Update daily revenue if payment status changed to complete
+            if (!wasCompleted && payment.PaymentStatus == "complete")
+            {
+                await UpdateDailyRevenueAsync(payment);
+            }
+
             await _uow.CompleteAsync();
             return true;
         }
 
         public async Task<bool> MarkAsProcessedAsync(int id, string transactionReference = null)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return false;
 
-            payment.PaymentStatus = "Processed";
+            payment.PaymentStatus = "processing";
             payment.ProcessedAt = DateTime.UtcNow;
             payment.UpdatedAt = DateTime.UtcNow;
 
             if (!string.IsNullOrEmpty(transactionReference))
                 payment.TransactionReference = transactionReference;
 
-            _paymentRepo.Update(payment);
+            _uow.Payments.Update(payment);
             await _uow.CompleteAsync();
             return true;
         }
 
         public async Task<bool> MarkAsCompletedAsync(int id, string transactionReference = null)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return false;
 
-            payment.PaymentStatus = "Completed";
+            payment.PaymentStatus = "complete";
             payment.CompletedAt = DateTime.UtcNow;
             payment.UpdatedAt = DateTime.UtcNow;
 
             if (!string.IsNullOrEmpty(transactionReference))
                 payment.TransactionReference = transactionReference;
 
-            _paymentRepo.Update(payment);
+            _uow.Payments.Update(payment);
+
+            // Update daily revenue
+            await UpdateDailyRevenueAsync(payment);
+
             await _uow.CompleteAsync();
             return true;
         }
 
         public async Task<bool> MarkAsFailedAsync(int id, string reason = null)
         {
-            var payment = await _paymentRepo.GetByIdAsync(id);
+            var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return false;
 
-            payment.PaymentStatus = "Failed";
+            payment.PaymentStatus = "pending";
             payment.UpdatedAt = DateTime.UtcNow;
 
             if (!string.IsNullOrEmpty(reason))
                 payment.DeletionReason = reason; // Using this field for failure reason
 
-            _paymentRepo.Update(payment);
+            _uow.Payments.Update(payment);
             await _uow.CompleteAsync();
             return true;
         }
 
-        // VNPay integration
+        // VNPay integration with transaction support
         public async Task<(PaymentDto Payment, string PaymentUrl)> CreateVnPayPaymentAsync(VnPayPaymentDto dto)
         {
-            // Create payment record
-            var createDto = _mapper.Map<CreatePaymentDto>(dto);
-            var payment = _mapper.Map<Payment>(createDto);
-
-            // Generate unique transaction reference
-            var transactionRef = $"PAY_{DateTime.Now.Ticks}_{dto.OrderId}";
-            payment.TransactionReference = transactionRef;
-
-            await _paymentRepo.AddAsync(payment);
-            await _uow.CompleteAsync();
-
-            // Create VNPay payment URL
-            var ipAddress = NetworkHelper.GetIpAddress(_httpContextAccessor.HttpContext);
-            var request = new PaymentRequest
+            await _uow.BeginTransactionAsync();
+            try
             {
-                PaymentId = payment.PaymentId,
-                Money = (double)dto.Amount,
-                Description = dto.Description,
-                IpAddress = ipAddress,
-                CreatedDate = DateTime.Now,
-                Currency = Currency.VND,
-                Language = DisplayLanguage.Vietnamese
-            };
+                // Create payment record
+                var createDto = _mapper.Map<CreatePaymentDto>(dto);
+                var payment = _mapper.Map<Payment>(createDto);
 
-            var paymentUrl = _vnpayPayment._vnpay.GetPaymentUrl(request);
-            var paymentDto = _mapper.Map<PaymentDto>(payment);
+                // Generate unique transaction reference
+                var transactionRef = $"PAY_{DateTime.Now.Ticks}_{dto.OrderId}";
+                payment.TransactionReference = transactionRef;
 
-            return (paymentDto, paymentUrl);
+                await _uow.Payments.AddAsync(payment);
+                await _uow.CompleteAsync();
+
+                // Create VNPay payment URL
+                var ipAddress = NetworkHelper.GetIpAddress(_httpContextAccessor.HttpContext);
+                var request = new PaymentRequest
+                {
+                    PaymentId = payment.PaymentId,
+                    Money = (double)dto.Amount,
+                    Description = dto.Description,
+                    IpAddress = ipAddress,
+                    CreatedDate = DateTime.Now,
+                    Currency = Currency.VND,
+                    Language = DisplayLanguage.Vietnamese
+                };
+
+                var paymentUrl = _vnpayPayment._vnpay.GetPaymentUrl(request);
+                var paymentDto = _mapper.Map<PaymentDto>(payment);
+
+                await _uow.CommitTransactionAsync();
+                return (paymentDto, paymentUrl);
+            }
+            catch
+            {
+                await _uow.RollbackTransactionAsync();
+                throw;
+            }
         }
 
         public async Task<PaymentDto> HandleVnPayCallbackAsync(VnPayCallbackDto callback)
         {
-            var payment = await _paymentRepo.FindAsync(p => p.PaymentId.ToString() == callback.vnp_TxnRef);
-            var paymentRecord = payment.FirstOrDefault();
-
-            if (paymentRecord == null) return null;
-
-            // Update payment based on VNPay response
-            if (callback.vnp_ResponseCode == "00" && callback.vnp_TransactionStatus == "00")
+            await _uow.BeginTransactionAsync();
+            try
             {
-                paymentRecord.PaymentStatus = "Completed";
-                paymentRecord.CompletedAt = DateTime.UtcNow;
-                paymentRecord.ProcessedAt = DateTime.UtcNow;
+                var payment = await _uow.Payments.FindAsync(p => p.PaymentId.ToString() == callback.vnp_TxnRef);
+                var paymentRecord = payment.FirstOrDefault();
+
+                if (paymentRecord == null)
+                {
+                    await _uow.RollbackTransactionAsync();
+                    return null;
+                }
+
+                // Update payment based on VNPay response
+                if (callback.vnp_ResponseCode == "00" && callback.vnp_TransactionStatus == "00")
+                {
+                    paymentRecord.PaymentStatus = "complete";
+                    paymentRecord.CompletedAt = DateTime.UtcNow;
+                    paymentRecord.ProcessedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    paymentRecord.PaymentStatus = "Failed";
+                    paymentRecord.DeletionReason = $"VNPay Error: {callback.vnp_ResponseCode}";
+                }
+
+                paymentRecord.TransactionReference = callback.vnp_TransactionNo;
+                paymentRecord.UpdatedAt = DateTime.UtcNow;
+
+                _uow.Payments.Update(paymentRecord);
+
+                // Update daily revenue if payment is completed
+                if (paymentRecord.PaymentStatus == "complete")
+                {
+                    await UpdateDailyRevenueAsync(paymentRecord);
+                }
+
+                await _uow.CompleteAsync();
+                await _uow.CommitTransactionAsync();
+                return _mapper.Map<PaymentDto>(paymentRecord);
             }
-            else
+            catch
             {
-                paymentRecord.PaymentStatus = "Failed";
-                paymentRecord.DeletionReason = $"VNPay Error: {callback.vnp_ResponseCode}";
+                await _uow.RollbackTransactionAsync();
+                throw;
             }
-
-            paymentRecord.TransactionReference = callback.vnp_TransactionNo;
-            paymentRecord.UpdatedAt = DateTime.UtcNow;
-
-            _paymentRepo.Update(paymentRecord);
-            await _uow.CompleteAsync();
-
-            return _mapper.Map<PaymentDto>(paymentRecord);
         }
 
         public async Task<PaymentDto> GetByTransactionReferenceAsync(string transactionReference)
         {
-            var payments = await _paymentRepo.FindAsync(p => p.TransactionReference == transactionReference);
+            var payments = await _uow.Payments.FindAsync(p => p.TransactionReference == transactionReference);
             var payment = payments.FirstOrDefault();
             return payment == null ? null : _mapper.Map<PaymentDto>(payment);
         }
@@ -302,8 +353,8 @@ namespace PRM.Noodle.BE.Service.Payments.Services
         // Analytics
         public async Task<decimal> GetTotalPaymentAmountAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            var query = _paymentRepo.GetQueryable()
-                .Where(p => p.IsDeleted != true && p.PaymentStatus == "Completed");
+            var query = _uow.Payments.GetQueryable()
+                .Where(p => p.IsDeleted != true && p.PaymentStatus == "complete");
 
             if (startDate.HasValue)
                 query = query.Where(p => p.PaymentDate >= startDate);
@@ -316,7 +367,7 @@ namespace PRM.Noodle.BE.Service.Payments.Services
 
         public async Task<Dictionary<string, int>> GetPaymentMethodStatisticsAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            var query = _paymentRepo.GetQueryable()
+            var query = _uow.Payments.GetQueryable()
                 .Where(p => p.IsDeleted != true);
 
             if (startDate.HasValue)
@@ -333,7 +384,7 @@ namespace PRM.Noodle.BE.Service.Payments.Services
 
         public async Task<Dictionary<string, int>> GetPaymentStatusStatisticsAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            var query = _paymentRepo.GetQueryable()
+            var query = _uow.Payments.GetQueryable()
                 .Where(p => p.IsDeleted != true);
 
             if (startDate.HasValue)
@@ -345,7 +396,60 @@ namespace PRM.Noodle.BE.Service.Payments.Services
             return await query
                 .GroupBy(p => p.PaymentStatus)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
-                .ToDictionaryAsync(x => x.Status ?? "Unknown", x => x.Count);
+                .ToDictionaryAsync(x => x.Status ?? "pending", x => x.Count);
+        }
+
+        private async Task UpdateDailyRevenueAsync(Payment payment)
+        {
+            if (payment.PaymentStatus != "complete" || !payment.PaymentDate.HasValue)
+                return;
+
+            var revenueDate = DateOnly.FromDateTime(payment.PaymentDate.Value);
+
+            // Find existing daily revenue record
+            var existingRevenue = await _uow.DailyRevenues.FindAsync(dr => dr.RevenueDate == revenueDate);
+            var dailyRevenue = existingRevenue.FirstOrDefault();
+
+            if (dailyRevenue == null)
+            {
+                // Create new daily revenue record
+                dailyRevenue = new DailyRevenue
+                {
+                    RevenueDate = revenueDate,
+                    TotalOrders = 1,
+                    TotalRevenue = payment.PaymentAmount,
+                    CashRevenue = payment.PaymentMethod.ToLower() == "cash" ? payment.PaymentAmount : 0,
+                    CardRevenue = payment.PaymentMethod.ToLower() == "card" ? payment.PaymentAmount : 0,
+                    DigitalWalletRevenue = payment.PaymentMethod.ToLower() == "digital_wallet" || payment.PaymentMethod.ToLower() == "vnpay" ? payment.PaymentAmount : 0,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await _uow.DailyRevenues.AddAsync(dailyRevenue);
+            }
+            else
+            {
+                // Update existing daily revenue record
+                dailyRevenue.TotalOrders = (dailyRevenue.TotalOrders ?? 0) + 1;
+                dailyRevenue.TotalRevenue = (dailyRevenue.TotalRevenue ?? 0) + payment.PaymentAmount;
+
+                switch (payment.PaymentMethod.ToLower())
+                {
+                    case "cash":
+                        dailyRevenue.CashRevenue = (dailyRevenue.CashRevenue ?? 0) + payment.PaymentAmount;
+                        break;
+                    case "card":
+                        dailyRevenue.CardRevenue = (dailyRevenue.CardRevenue ?? 0) + payment.PaymentAmount;
+                        break;
+                    case "digital_wallet":
+                    case "vnpay":
+                        dailyRevenue.DigitalWalletRevenue = (dailyRevenue.DigitalWalletRevenue ?? 0) + payment.PaymentAmount;
+                        break;
+                }
+
+                dailyRevenue.UpdatedAt = DateTime.UtcNow;
+                _uow.DailyRevenues.Update(dailyRevenue);
+            }
         }
     }
 }

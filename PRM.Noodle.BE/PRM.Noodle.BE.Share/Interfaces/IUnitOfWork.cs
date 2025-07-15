@@ -18,7 +18,7 @@ namespace PRM.Noodle.BE.Share.Interfaces
         IGenericRepository<OrderCombo> OrderCombos { get; }
         IGenericRepository<DailyRevenue> DailyRevenues { get; }
         IGenericRepository<OrderItemTopping> OrderItemTopping { get; }
-
+        IGenericRepository<Payment> Payments { get; }
 
 
         int Complete();

@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Payme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Users", "PRM.Noodle.BE.Service.Users\PRM.Noodle.BE.Service.Users.csproj", "{EFE9F925-F800-459A-A3B8-F3C66D263308}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Noodle.BE.Service.Reports", "PRM.Noodle.BE.Service.Reports\PRM.Noodle.BE.Service.Reports.csproj", "{96F68C27-D4BD-4DED-BB66-6975FF3848E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{EFE9F925-F800-459A-A3B8-F3C66D263308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFE9F925-F800-459A-A3B8-F3C66D263308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFE9F925-F800-459A-A3B8-F3C66D263308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96F68C27-D4BD-4DED-BB66-6975FF3848E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96F68C27-D4BD-4DED-BB66-6975FF3848E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96F68C27-D4BD-4DED-BB66-6975FF3848E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96F68C27-D4BD-4DED-BB66-6975FF3848E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

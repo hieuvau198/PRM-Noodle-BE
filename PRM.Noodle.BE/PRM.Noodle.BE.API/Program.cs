@@ -21,6 +21,8 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using PRM.Noodle.BE.Service.Payments.Services;
 using PRM.Noodle.BE.Service.Payments.Mappings;
+using PRM.Noodle.BE.Service.Reports.Mappings;
+using PRM.Noodle.BE.Service.Reports.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -116,7 +118,8 @@ builder.Services
     typeof(ComboMappingProfile),
     typeof(OrderMappingProfile),
     typeof(UserMappingProfile),
-    typeof(PaymentMappingProfile)
+    typeof(PaymentMappingProfile),
+    typeof(ReportMappingProfile)
     );
 
 #endregion  
@@ -140,6 +143,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+
+builder.Services.AddScoped<IReportService, ReportService>();
 
 #endregion
 
