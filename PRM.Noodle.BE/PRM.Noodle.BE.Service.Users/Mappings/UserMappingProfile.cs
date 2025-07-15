@@ -11,7 +11,7 @@ namespace PRM.Noodle.BE.Service.Users.Mappings
 {
     public class UserMappingProfile : Profile
     {
-        public UserMappingProfile() 
+        public UserMappingProfile()
         {
             CreateMap<User, UserDto>();
 
@@ -32,6 +32,26 @@ namespace PRM.Noodle.BE.Service.Users.Mappings
                 .ForMember(dest => dest.Password, opt => opt.Ignore())
                 .ForMember(dest => dest.Role, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.Orders, opt => opt.Ignore())
+                .ForMember(dest => dest.PaymentCustomerUsers, opt => opt.Ignore())
+                .ForMember(dest => dest.PaymentStaffUsers, opt => opt.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            // New mappings for User CRUD operations
+            CreateMap<CreateUserDto, User>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Password, opt => opt.Ignore()) // Will be set manually after hashing
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.Orders, opt => opt.Ignore())
+                .ForMember(dest => dest.PaymentCustomerUsers, opt => opt.Ignore())
+                .ForMember(dest => dest.PaymentStaffUsers, opt => opt.Ignore());
+
+            CreateMap<UpdateUserDto, User>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Password, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Orders, opt => opt.Ignore())

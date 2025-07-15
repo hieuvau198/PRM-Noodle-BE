@@ -136,6 +136,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
