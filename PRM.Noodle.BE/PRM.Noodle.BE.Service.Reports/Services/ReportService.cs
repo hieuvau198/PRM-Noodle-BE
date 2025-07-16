@@ -273,8 +273,9 @@ namespace PRM.Noodle.BE.Service.Reports.Services
 
         public async Task<decimal> GetTotalRevenueAsync()
         {
-            var orders = await _uow.Orders.GetAllAsync();
-            return orders.Sum(o => o.TotalAmount);
+            var dailyRevenues = await _uow.DailyRevenues.GetAllAsync();
+            return dailyRevenues
+        .Sum(r => r.TotalRevenue ?? 0);
         }
 
         public async Task<TopProductDto> GetMostOrderedProductAsync()
