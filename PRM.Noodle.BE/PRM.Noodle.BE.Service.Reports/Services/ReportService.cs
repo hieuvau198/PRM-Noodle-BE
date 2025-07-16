@@ -311,5 +311,29 @@ namespace PRM.Noodle.BE.Service.Reports.Services
                 TotalOrdered = mostOrderedProduct.TotalOrdered
             };
         }
+
+        public async Task<IEnumerable<OrderStatusPortionDto>> GetOrderPortionsByStatusAsync()
+        {
+            var orders = await _uow.Orders.GetAllAsync();
+
+            if (!orders.Any())
+                return new List<OrderStatusPortionDto>();
+
+            int totalOrders = orders.Count();
+
+            var portions = orders
+                .GroupBy(o => o.OrderStatus)
+                .Select(g => new OrderStatusPortionDto
+                {
+                    Status = g.Key,
+                    Count = g.Count(),
+                    Percentage = Math.Round((double)g.Count() * 100 / totalOrders, 2)
+                })
+                .OrderByDescending(p => p.Count)
+                .ToList();
+
+            return portions;
+        }
+
     }
 }

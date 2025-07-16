@@ -21,5 +21,6 @@ namespace PRM.Noodle.BE.Service.Reports.Services
         Task<int> GetTotalOrdersAsync();
         Task<decimal> GetTotalRevenueAsync();
         Task<TopProductDto> GetMostOrderedProductAsync();
+        Task<IEnumerable<OrderStatusPortionDto>> GetOrderPortionsByStatusAsync();
     }
 }

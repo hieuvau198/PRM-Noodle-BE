@@ -72,4 +72,11 @@ namespace PRM.Noodle.BE.Service.Reports.Models
         public string ProductName { get; set; }
         public int TotalOrdered { get; set; }
     }
+
+    public class OrderStatusPortionDto
+    {
+        public string Status { get; set; }
+        public int Count { get; set; }
+        public double Percentage { get; set; }
+    }
 }

@@ -257,5 +257,18 @@ namespace PRM.Noodle.BE.Service.Reports.Controllers
             }
         }
 
+        [HttpGet("orders/status-portions")]
+        public async Task<ActionResult<IEnumerable<OrderStatusPortionDto>>> GetOrderPortionsByStatus()
+        {
+            try
+            {
+                var result = await _reportService.GetOrderPortionsByStatusAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
