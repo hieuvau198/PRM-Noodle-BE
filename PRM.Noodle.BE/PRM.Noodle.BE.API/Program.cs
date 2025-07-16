@@ -154,18 +154,30 @@ builder.Services.AddScoped<IReportService, ReportService>();
 //    .AddApplicationPart(typeof(ProductsController).Assembly);
 #endregion
 
+#region Setup CORS
 
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowSpecificOrigin", policy =>
+//    {
+//        policy.WithOrigins("http://localhost:3000", "https://localhost:3001", "http://localhost:5173", "http://localhost:5174") // Add your frontend URLs
+//              .AllowAnyHeader()
+//              .AllowAnyMethod()
+//              .AllowCredentials();
+//    });
+//});
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://localhost:3001", "http://localhost:5173", "http://localhost:5174") // Add your frontend URLs
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
     });
 });
+#endregion
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -186,7 +198,8 @@ if (true)
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowSpecificOrigin");
+//app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 
