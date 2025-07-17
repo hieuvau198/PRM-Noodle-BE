@@ -96,6 +96,8 @@ namespace PRM.Noodle.BE.Service.Payments.Services
             var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return null;
 
+            var oldPaymentStatus = payment.PaymentStatus;
+
             var wasCompleted = payment.PaymentStatus == "complete";
 
             _mapper.Map(dto, payment);
@@ -103,6 +105,10 @@ namespace PRM.Noodle.BE.Service.Payments.Services
 
             _uow.Payments.Update(payment);
 
+            if (oldPaymentStatus != payment.PaymentStatus)
+            {
+                await UpdateOrderPaymentStatusAsync(payment.OrderId, payment.PaymentStatus);
+            }
             // Update daily revenue if payment status changed to complete
             if (!wasCompleted && payment.PaymentStatus == "complete")
             {
@@ -177,6 +183,8 @@ namespace PRM.Noodle.BE.Service.Payments.Services
             var payment = await _uow.Payments.GetByIdAsync(id);
             if (payment == null) return false;
 
+            var oldPaymentStatus = payment.PaymentStatus;
+
             var wasCompleted = payment.PaymentStatus == "complete";
 
             payment.PaymentStatus = dto.PaymentStatus;
@@ -186,6 +194,12 @@ namespace PRM.Noodle.BE.Service.Payments.Services
             payment.UpdatedAt = DateTime.UtcNow;
 
             _uow.Payments.Update(payment);
+
+            // Update order payment status if payment status changed
+            if (oldPaymentStatus != payment.PaymentStatus)
+            {
+                await UpdateOrderPaymentStatusAsync(payment.OrderId, payment.PaymentStatus);
+            }
 
             // Update daily revenue if payment status changed to complete
             if (!wasCompleted && payment.PaymentStatus == "complete")
@@ -210,6 +224,9 @@ namespace PRM.Noodle.BE.Service.Payments.Services
                 payment.TransactionReference = transactionReference;
 
             _uow.Payments.Update(payment);
+
+            await UpdateOrderPaymentStatusAsync(payment.OrderId, "processing");
+
             await _uow.CompleteAsync();
             return true;
         }
@@ -227,6 +244,8 @@ namespace PRM.Noodle.BE.Service.Payments.Services
                 payment.TransactionReference = transactionReference;
 
             _uow.Payments.Update(payment);
+
+            await UpdateOrderPaymentStatusAsync(payment.OrderId, "complete");
 
             // Update daily revenue
             await UpdateDailyRevenueAsync(payment);
@@ -247,6 +266,9 @@ namespace PRM.Noodle.BE.Service.Payments.Services
                 payment.DeletionReason = reason; // Using this field for failure reason
 
             _uow.Payments.Update(payment);
+
+            await UpdateOrderPaymentStatusAsync(payment.OrderId, "pending");
+
             await _uow.CompleteAsync();
             return true;
         }
@@ -308,6 +330,8 @@ namespace PRM.Noodle.BE.Service.Payments.Services
                     return null;
                 }
 
+                var oldPaymentStatus = paymentRecord.PaymentStatus;
+
                 // Update payment based on VNPay response
                 if (callback.vnp_ResponseCode == "00" && callback.vnp_TransactionStatus == "00")
                 {
@@ -325,6 +349,11 @@ namespace PRM.Noodle.BE.Service.Payments.Services
                 paymentRecord.UpdatedAt = DateTime.UtcNow;
 
                 _uow.Payments.Update(paymentRecord);
+
+                if (oldPaymentStatus != paymentRecord.PaymentStatus)
+                {
+                    await UpdateOrderPaymentStatusAsync(paymentRecord.OrderId, paymentRecord.PaymentStatus);
+                }
 
                 // Update daily revenue if payment is completed
                 if (paymentRecord.PaymentStatus == "complete")
@@ -449,6 +478,16 @@ namespace PRM.Noodle.BE.Service.Payments.Services
 
                 dailyRevenue.UpdatedAt = DateTime.UtcNow;
                 _uow.DailyRevenues.Update(dailyRevenue);
+            }
+        }
+
+        private async Task UpdateOrderPaymentStatusAsync(int orderId, string paymentStatus)
+        {
+            var order = await _uow.Orders.GetByIdAsync(orderId);
+            if (order != null)
+            {
+                order.PaymentStatus = paymentStatus ;
+                _uow.Orders.Update(order);
             }
         }
     }
